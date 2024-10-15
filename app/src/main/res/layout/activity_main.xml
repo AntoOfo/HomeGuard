@@ -37,7 +37,7 @@
         android:id="@+id/divider"
         android:layout_width="409dp"
         android:layout_height="1dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="32dp"
         android:background="?android:attr/listDivider"
         android:backgroundTint="#000000"
         android:scaleY="3"
@@ -46,54 +46,14 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/fireTile"
-        android:layout_width="372dp"
-        android:layout_height="74dp"
-        android:layout_marginTop="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/linearLayout4"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/fireText"
-                android:layout_width="153dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="16dp"
-                android:fontFamily="sans-serif-black"
-                android:text="Fire Detection"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/fireStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="32dp"
-                android:fontFamily="sans-serif-black"
-                android:text="No"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.468" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
         android:id="@+id/gasTile"
         android:layout_width="372dp"
         android:layout_height="74dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="18dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fireTile">
 
@@ -133,9 +93,11 @@
         android:id="@+id/floodTile"
         android:layout_width="372dp"
         android:layout_height="74dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="18dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gasTile">
 
@@ -175,16 +137,20 @@
         android:id="@+id/temperatureTile"
         android:layout_width="372dp"
         android:layout_height="74dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="18dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/floodTile">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linearLayoutTemperature"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            tools:layout_editor_absoluteX="20dp"
+            tools:layout_editor_absoluteY="475dp">
 
             <TextView
                 android:id="@+id/temperatureText"
@@ -213,6 +179,94 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
+    <Button
+        android:id="@+id/monitorBtn"
+        android:layout_width="364dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-black"
+        android:text="View Sensor Readings"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/temperatureTile" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/fireTile"
+        android:layout_width="372dp"
+        android:layout_height="74dp"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.512"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/linearLayout4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/fireText"
+                android:layout_width="153dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="16dp"
+                android:fontFamily="sans-serif-black"
+                android:text="Fire Detection"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/fireStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="32dp"
+                android:fontFamily="sans-serif-black"
+                android:text="No"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.468" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/phoneBtn"
+        android:layout_width="54dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@android:drawable/stat_sys_phone_call_on_hold" />
+
+    <ImageView
+        android:id="@+id/settingsBtn"
+        android:layout_width="54dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="96dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/phoneBtn"
+        app:layout_constraintTop_toBottomOf="@+id/monitorBtn"
+        app:layout_constraintVertical_bias="0.6"
+        app:srcCompat="@drawable/settingsicon" />
+
+    <ImageView
+        android:id="@+id/helpBtn"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.595"
+        app:layout_constraintStart_toEndOf="@+id/settingsBtn"
+        app:srcCompat="@android:drawable/ic_menu_help" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
