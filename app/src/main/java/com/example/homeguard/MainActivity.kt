@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.Nullable
@@ -51,13 +52,18 @@ class MainActivity : AppCompatActivity() {
 
         floodTile.setOnClickListener {
 
+            // placeholders
+            val levels = "10%"
+            val message = "Monitor and stuff"
+            showFloodDetailsDialog(levels, message)
         }
 
         tempTile.setOnClickListener {
 
+            // placeholders
             val temp = "17°C"
             val humidity = "45%"
-            val status = "Normal"
+            val status = "Normal"  // add if statements for different temp levels
             showTempDetailsDialog(temp, humidity, status)
         }
 
@@ -79,6 +85,32 @@ class MainActivity : AppCompatActivity() {
         message.text = "Current temperature: $temp\n" +
                        "Humidity level: $humidity\n" +
                        "Status: $status"
+
+        builder.setView(dialogView)
+
+        // create dialog
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        closeBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun showFloodDetailsDialog(levels: String, message: String) {
+
+        val builder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_flood_details, null)
+
+        val title = dialogView.findViewById<TextView>(R.id.dialogFloodTitle)
+        val message = dialogView.findViewById<TextView>(R.id.dialogFloodMessage)
+        val closeBtn = dialogView.findViewById<Button>(R.id.closeBtn)
+
+        title.text = "Water Level Details"
+        message.text = "Level: $levels\n" +
+                       "Monitor and stuff"
 
         builder.setView(dialogView)
 
