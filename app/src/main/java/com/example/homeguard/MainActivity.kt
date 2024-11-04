@@ -1,10 +1,12 @@
 package com.example.homeguard
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.Nullable
@@ -24,12 +26,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
         val fireTile = findViewById<CardView>(R.id.fireTile)
         val gasTile = findViewById<CardView>(R.id.gasTile)
         val floodTile = findViewById<CardView>(R.id.floodTile)
         val tempTile = findViewById<CardView>(R.id.temperatureTile)
+        val callBtn = findViewById<ImageView>(R.id.phoneBtn)
 
         mainStatus = findViewById(R.id.statusText)
         mainStatus.text = "Status: All Systems Normal"
@@ -65,6 +69,11 @@ class MainActivity : AppCompatActivity() {
             val humidity = "45%"
             val status = "Normal"  // add if statements for different temp levels
             showTempDetailsDialog(temp, humidity, status)
+        }
+
+        callBtn.setOnClickListener {
+            val intent = Intent(this, EmergencyServicesActivity::class.java)
+            startActivity(intent)
         }
 
         }
