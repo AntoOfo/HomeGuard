@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.Nullable
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.view.ViewCompat
@@ -57,5 +58,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun showTempDetailsDialog() {
         // builds/shows detailed AlertDialog
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Temperature Details")
+        builder.setMessage("Current Temperature: 17°C\nHumidity Level: 45%\nStatus: Normal")
+
+        // close button
+        builder.setPositiveButton("Close") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        // show dialog
+        val dialog = builder.create()
+        dialog.show()
     }
     }
