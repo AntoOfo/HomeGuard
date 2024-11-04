@@ -1,6 +1,9 @@
 package com.example.homeguard
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.Nullable
@@ -51,24 +54,42 @@ class MainActivity : AppCompatActivity() {
         }
 
         tempTile.setOnClickListener {
-            showTempDetailsDialog()
+
+            val temp = "17°C"
+            val humidity = "45%"
+            val status = "Normal"
+            showTempDetailsDialog(temp, humidity, status)
         }
 
         }
 
-    private fun showTempDetailsDialog() {
+    private fun showTempDetailsDialog(temp: String, humidity: String, status: String) {
         // builds/shows detailed AlertDialog
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Temperature Details")
-        builder.setMessage("Current Temperature: 17°C\nHumidity Level: 45%\nStatus: Normal")
 
-        // close button
-        builder.setPositiveButton("Close") { dialog, _ ->
+        // inflate custom layout
+        val dialogView = layoutInflater.inflate(R.layout.dialog_temperature_details, null)
+
+        val title = dialogView.findViewById<TextView>(R.id.dialogTitle)
+        val message = dialogView.findViewById<TextView>(R.id.dialogMessage)
+        val closeBtn = dialogView.findViewById<TextView>(R.id.closeBtn)
+
+        // texts to be changed
+        title.text = "Temperature Details"
+        message.text = "Current temperature: $temp\n" +
+                       "Humidity level: $humidity\n" +
+                       "Status: $status"
+
+        builder.setView(dialogView)
+
+        // create dialog
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        closeBtn.setOnClickListener {
             dialog.dismiss()
         }
 
-        // show dialog
-        val dialog = builder.create()
         dialog.show()
     }
     }
