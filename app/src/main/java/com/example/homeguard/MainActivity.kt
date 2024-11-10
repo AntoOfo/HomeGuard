@@ -15,6 +15,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +30,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gasStatus: TextView
     private lateinit var floodStatus: TextView
     private lateinit var tempStatus: TextView
+
+    // firebase db references
+    private lateinit var tempRef: DatabaseReference
+    private lateinit var humidityRef: DatabaseReference
+
+    private var humidity: Double = 0.0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +59,39 @@ class MainActivity : AppCompatActivity() {
         floodStatus.text = "Low"
         tempStatus = findViewById(R.id.temperatureStatus)
         tempStatus.text = "Normal"
+        
+        // firebase db references
+        tempRef = FirebaseDatabase.getInstance().getReference("sensors/temperature")
+        humidityRef = FirebaseDatabase.getInstance().getReference("sensors/humidity")
+
+        // read temp from firebase
+        tempRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                // get value for temp
+                val temperature = snapshot.child("value").getValue(Double::class.java) ?: 0.0
+
+
+                updateTempStatus(temperature)
+                tempTile.setOnClickListener {
+                    showTempDetailsDialog(temperature, humidity)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
+
+        // read humidity from firebase
+        humidityRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                humidity = snapshot.child("value").getValue(Double::class.java) ?: 0.0
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle errors if needed
+            }
+        })
 
         fireTile.setOnClickListener {
 
@@ -62,14 +109,6 @@ class MainActivity : AppCompatActivity() {
             showFloodDetailsDialog(levels, message)
         }
 
-        tempTile.setOnClickListener {
-
-            // placeholders
-            val temp = "17°C"
-            val humidity = "45%"
-            val status = "Normal"  // add if statements for different temp levels
-            showTempDetailsDialog(temp, humidity, status)
-        }
 
         callBtn.setOnClickListener {
             val intent = Intent(this, EmergencyServicesActivity::class.java)
@@ -78,7 +117,22 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-    private fun showTempDetailsDialog(temp: String, humidity: String, status: String) {
+    private fun updateTempStatus(temperature: Double) {
+        // update temp status from values
+        when {
+            temperature < 10 -> {
+                tempStatus.text = "Low"
+            }
+            temperature in 10.0..30.0 -> {
+                tempStatus.text = "Normal"
+            }
+            temperature > 30 -> {
+                tempStatus.text = "High"
+            }
+        }
+    }
+
+    private fun showTempDetailsDialog(temp: Double, humidity: Double) {
         // builds/shows detailed AlertDialog
         val builder = AlertDialog.Builder(this)
 
@@ -89,10 +143,16 @@ class MainActivity : AppCompatActivity() {
         val message = dialogView.findViewById<TextView>(R.id.dialogMessage)
         val closeBtn = dialogView.findViewById<TextView>(R.id.closeBtn)
 
+        // calculates status
+        val status = when {
+            temp < 10 -> "Low Temperature"
+            temp in 10.0..30.0 -> "Normal"
+            else -> "High Temperature"
+        }
         // texts to be changed
         title.text = "Temperature Details"
-        message.text = "Current temperature: $temp\n" +
-                       "Humidity level: $humidity\n" +
+        message.text = "Current temperature: $temp°C\n" +
+                       "Humidity level: $humidity%\n" +
                        "Status: $status"
 
         builder.setView(dialogView)
