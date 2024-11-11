@@ -36,6 +36,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var humidityRef: DatabaseReference
 
     private var humidity: Double = 0.0
+    private var temp: Double = 0.0
+
+    private var tempDialog: AlertDialog? = null
+    private lateinit var dialogMessage: TextView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,14 +72,11 @@ class MainActivity : AppCompatActivity() {
         tempRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 // get value for temp
-                val temperature = snapshot.child("value").getValue(Double::class.java) ?: 0.0
+                temp = snapshot.child("value").getValue(Double::class.java) ?: 0.0
 
-
-                updateTempStatus(temperature)
-                tempTile.setOnClickListener {
-                    showTempDetailsDialog(temperature, humidity)
+                updateTempStatus(temp)
+                updateDialog()
                 }
-            }
 
             override fun onCancelled(error: DatabaseError) {
                 TODO("Not yet implemented")
@@ -86,12 +87,17 @@ class MainActivity : AppCompatActivity() {
         humidityRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 humidity = snapshot.child("value").getValue(Double::class.java) ?: 0.0
+                updateDialog()
             }
 
             override fun onCancelled(error: DatabaseError) {
                 // Handle errors if needed
             }
         })
+
+        tempTile.setOnClickListener {
+            showTempDetailsDialog()
+        }
 
         fireTile.setOnClickListener {
 
@@ -119,53 +125,54 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateTempStatus(temperature: Double) {
         // update temp status from values
-        when {
-            temperature < 10 -> {
-                tempStatus.text = "Low"
-            }
-            temperature in 10.0..30.0 -> {
-                tempStatus.text = "Normal"
-            }
-            temperature > 30 -> {
-                tempStatus.text = "High"
-            }
+        tempStatus.text = when {
+            temperature < 10 -> "Low"
+            temperature in 10.0..30.0 -> "Normal"
+            else -> "High"
         }
     }
 
-    private fun showTempDetailsDialog(temp: Double, humidity: Double) {
-        // builds/shows detailed AlertDialog
-        val builder = AlertDialog.Builder(this)
 
-        // inflate custom layout
-        val dialogView = layoutInflater.inflate(R.layout.dialog_temperature_details, null)
+    private fun showTempDetailsDialog() {
 
-        val title = dialogView.findViewById<TextView>(R.id.dialogTitle)
-        val message = dialogView.findViewById<TextView>(R.id.dialogMessage)
-        val closeBtn = dialogView.findViewById<TextView>(R.id.closeBtn)
+        if (tempDialog == null) {
+            // build the dialog only if it hasn't been created
+            val builder = AlertDialog.Builder(this)
+            val dialogView = layoutInflater.inflate(R.layout.dialog_temperature_details, null)
+            dialogMessage = dialogView.findViewById(R.id.dialogMessage)
+            val closeBtn = dialogView.findViewById<TextView>(R.id.closeBtn)
 
-        // calculates status
-        val status = when {
-            temp < 10 -> "Low Temperature"
-            temp in 10.0..30.0 -> "Normal"
-            else -> "High Temperature"
-        }
-        // texts to be changed
-        title.text = "Temperature Details"
-        message.text = "Current temperature: $temp°C\n" +
-                       "Humidity level: $humidity%\n" +
-                       "Status: $status"
+            builder.setView(dialogView)
+            tempDialog = builder.create()
+            tempDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        builder.setView(dialogView)
-
-        // create dialog
-        val dialog = builder.create()
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        closeBtn.setOnClickListener {
-            dialog.dismiss()
+            closeBtn.setOnClickListener {
+                tempDialog?.dismiss()
+            }
         }
 
-        dialog.show()
+        // show the dialog if it's not already showing
+        if (tempDialog?.isShowing == false) {
+            tempDialog?.show()
+        }
+
+        // show latest values in dialog
+        updateDialog()
+    }
+
+    private fun updateDialog() {
+        // This method updates the dialog with the latest temperature and humidity
+        if (::dialogMessage.isInitialized) {
+            val status = when {
+                temp < 10 -> "Low Temperature"
+                temp in 10.0..30.0 -> "Normal"
+                else -> "High Temperature"
+            }
+
+            dialogMessage.text = "Current temperature: $temp°C\n" +
+                    "Humidity level: $humidity%\n" +
+                    "Status: $status"
+        }
     }
 
     private fun showFloodDetailsDialog(levels: String, message: String) {
