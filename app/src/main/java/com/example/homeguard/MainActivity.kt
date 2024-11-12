@@ -34,9 +34,11 @@ class MainActivity : AppCompatActivity() {
     // firebase db references
     private lateinit var tempRef: DatabaseReference
     private lateinit var humidityRef: DatabaseReference
+    private lateinit var waterLevelRef: DatabaseReference
 
     private var humidity: Double = 0.0
     private var temp: Double = 0.0
+    private var waterLevel: Double = 0.0
 
     private var tempDialog: AlertDialog? = null
     private lateinit var dialogMessage: TextView
@@ -67,6 +69,7 @@ class MainActivity : AppCompatActivity() {
         // firebase db references
         tempRef = FirebaseDatabase.getInstance().getReference("sensors/temperature")
         humidityRef = FirebaseDatabase.getInstance().getReference("sensors/humidity")
+        waterLevelRef = FirebaseDatabase.getInstance().getReference("sensors/water_level")
 
         // read temp from firebase
         tempRef.addValueEventListener(object : ValueEventListener {
@@ -95,6 +98,18 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        // read water level from firebase
+        waterLevelRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                waterLevel = snapshot.child("value").getValue(Double::class.java) ?: 0.0
+                updateFloodStatus(waterLevel)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle any database error
+            }
+        })
+
         tempTile.setOnClickListener {
             showTempDetailsDialog()
         }
@@ -109,10 +124,7 @@ class MainActivity : AppCompatActivity() {
 
         floodTile.setOnClickListener {
 
-            // placeholders
-            val levels = "10%"
-            val message = "Monitor and stuff"
-            showFloodDetailsDialog(levels, message)
+            showFloodDetailsDialog()
         }
 
 
@@ -128,6 +140,14 @@ class MainActivity : AppCompatActivity() {
         tempStatus.text = when {
             temperature < 10 -> "Low"
             temperature in 10.0..30.0 -> "Normal"
+            else -> "High"
+        }
+    }
+
+    private fun updateFloodStatus(level: Double) {
+        floodStatus.text = when {
+            level < 25 -> "Low"
+            level in 25.0..75.0 -> "Moderate"
             else -> "High"
         }
     }
@@ -175,18 +195,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showFloodDetailsDialog(levels: String, message: String) {
+    private fun showFloodDetailsDialog() {
 
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_flood_details, null)
 
         val title = dialogView.findViewById<TextView>(R.id.dialogFloodTitle)
-        val message = dialogView.findViewById<TextView>(R.id.dialogFloodMessage)
+        val floodMessage = dialogView.findViewById<TextView>(R.id.dialogFloodMessage)
         val closeBtn = dialogView.findViewById<Button>(R.id.closeBtn)
 
         title.text = "Water Level Details"
-        message.text = "Level: $levels\n" +
-                       "Monitor and stuff"
+
+        val waterLevelStatus = when {
+            waterLevel < 25 -> "Low"
+            waterLevel in 25.0..75.0 -> "Moderate - Monitor the levels"
+            else -> "High - Risk of flooding!"
+        }
+
+        floodMessage.text = "Level: ${waterLevel}%\nStatus: $waterLevelStatus"
 
         builder.setView(dialogView)
 
