@@ -35,13 +35,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tempRef: DatabaseReference
     private lateinit var humidityRef: DatabaseReference
     private lateinit var waterLevelRef: DatabaseReference
+    private lateinit var gasRef: DatabaseReference
 
     private var humidity: Double = 0.0
     private var temp: Double = 0.0
     private var waterLevel: Double = 0.0
+    private var gasLevel: Double = 0.0
 
     private var tempDialog: AlertDialog? = null
     private lateinit var dialogMessage: TextView
+    private var gasDialog: AlertDialog? = null
+    private lateinit var gasMessage: TextView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         tempRef = FirebaseDatabase.getInstance().getReference("sensors/temperature")
         humidityRef = FirebaseDatabase.getInstance().getReference("sensors/humidity")
         waterLevelRef = FirebaseDatabase.getInstance().getReference("sensors/water_level")
+        gasRef = FirebaseDatabase.getInstance().getReference("sensors/gas")
 
         // read temp from firebase
         tempRef.addValueEventListener(object : ValueEventListener {
@@ -110,6 +115,17 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        // read gas level from firebase
+        gasRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                gasLevel = snapshot.child("value").getValue(Double::class.java) ?: 0.0
+                updateGasStatus(gasLevel)
+                updateGasDialog()
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+
         tempTile.setOnClickListener {
             showTempDetailsDialog()
         }
@@ -119,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         gasTile.setOnClickListener {
-
+            showGasDetailsDialog()
         }
 
         floodTile.setOnClickListener {
@@ -149,6 +165,14 @@ class MainActivity : AppCompatActivity() {
             level < 25 -> "Low"
             level in 25.0..75.0 -> "Moderate"
             else -> "High"
+        }
+    }
+
+    private fun updateGasStatus(level: Double) {
+        gasStatus.text = when {
+            level < 25 -> "Safe"
+            level in 25.0..75.0 -> "Warning"
+            else -> "Danger"
         }
     }
 
@@ -195,6 +219,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateGasDialog() {
+        if (::gasMessage.isInitialized) {
+            val gasStatusText = when {
+                gasLevel < 25 -> "Air Quality Stable - No immediate risk."
+                gasLevel in 25.0..75.0 -> "Warning! Elevated gas levels detected - Please monitor."
+                else -> "Critical Alert! High gas levels detected - Immediate action needed!"
+            }
+
+            gasMessage.text = "Gas Level: ${gasLevel}%\nStatus: $gasStatusText"  // Update dialog message
+        }
+    }
+
     private fun showFloodDetailsDialog() {
 
         val builder = AlertDialog.Builder(this)
@@ -225,5 +261,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         dialog.show()
+    }
+
+    private fun showGasDetailsDialog() {
+
+        if (gasDialog == null) {  // Only create the dialog if it hasn't been created
+            val builder = AlertDialog.Builder(this)
+            val dialogView = layoutInflater.inflate(R.layout.dialog_gas_details, null)
+
+            val title = dialogView.findViewById<TextView>(R.id.dialogGasTitle)
+            gasMessage = dialogView.findViewById(R.id.dialogGasMessage)  // Store reference for updates
+            val closeBtn = dialogView.findViewById<Button>(R.id.closeGasBtn)
+
+            title.text = "Gas Level Details"
+
+            builder.setView(dialogView)
+            gasDialog = builder.create()
+            gasDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            closeBtn.setOnClickListener {
+                gasDialog?.dismiss()
+            }
+        }
+
+        if (gasDialog?.isShowing == false) {
+            gasDialog?.show()
+        }
+
+        // Initial call to update with current data
+        updateGasDialog()
     }
     }
