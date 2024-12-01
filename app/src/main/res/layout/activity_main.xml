@@ -237,16 +237,6 @@
     </androidx.cardview.widget.CardView>
 
     <ImageView
-        android:id="@+id/phoneBtn"
-        android:layout_width="54dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/stat_sys_phone_call_on_hold" />
-
-    <ImageView
         android:id="@+id/settingsBtn"
         android:layout_width="54dp"
         android:layout_height="52dp"
@@ -254,14 +244,24 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/phoneBtn"
         app:layout_constraintTop_toBottomOf="@+id/monitorBtn"
-        app:layout_constraintVertical_bias="0.6"
+        app:layout_constraintVertical_bias="0.42"
         app:srcCompat="@drawable/settingsicon" />
+
+    <ImageView
+        android:id="@+id/phoneBtn"
+        android:layout_width="54dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginBottom="36dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@android:drawable/stat_sys_phone_call_on_hold" />
 
     <ImageView
         android:id="@+id/helpBtn"
         android:layout_width="58dp"
         android:layout_height="58dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.595"

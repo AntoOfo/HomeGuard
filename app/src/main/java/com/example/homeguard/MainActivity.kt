@@ -131,7 +131,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         fireTile.setOnClickListener {
-
+            val intent = Intent(this, CameraFeedActivity::class.java)
+            startActivity(intent)
         }
 
         gasTile.setOnClickListener {
