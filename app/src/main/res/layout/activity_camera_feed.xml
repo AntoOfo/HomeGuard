@@ -9,13 +9,15 @@
 
     <WebView
         android:id="@+id/camWebView"
-        android:layout_width="318dp"
-        android:layout_height="279dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginTop="48dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/firefeedStatus"
+        app:layout_constraintDimensionRatio="H,4:3" />
 
     <TextView
         android:id="@+id/firefeedStatus"

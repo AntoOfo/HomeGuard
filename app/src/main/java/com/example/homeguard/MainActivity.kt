@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var humidityRef: DatabaseReference
     private lateinit var waterLevelRef: DatabaseReference
     private lateinit var gasRef: DatabaseReference
+    private lateinit var fireRef: DatabaseReference
 
     private var humidity: Double = 0.0
     private var temp: Double = 0.0
@@ -75,7 +76,19 @@ class MainActivity : AppCompatActivity() {
         humidityRef = FirebaseDatabase.getInstance().getReference("sensors/humidity")
         waterLevelRef = FirebaseDatabase.getInstance().getReference("sensors/water_level")
         gasRef = FirebaseDatabase.getInstance().getReference("sensors/gas")
+        fireRef = FirebaseDatabase.getInstance().getReference("sensors/fire_detection")
 
+        fireRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val fireStatusData = snapshot.child("status").getValue(String::class.java)
+
+                updateFireStatus(fireStatusData)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
         // read temp from firebase
         tempRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -158,6 +171,13 @@ class MainActivity : AppCompatActivity() {
             temperature < 10 -> "Low"
             temperature in 10.0..30.0 -> "Normal"
             else -> "High"
+        }
+    }
+
+    private fun updateFireStatus(fireStatusData: String?) {
+        fireStatus.text = when (fireStatusData) {
+            "fire detected" -> "Yes"
+            else -> "No"
         }
     }
 
