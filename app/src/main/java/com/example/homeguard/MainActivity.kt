@@ -1,8 +1,12 @@
 package com.example.homeguard
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.Button
@@ -13,6 +17,8 @@ import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.database.DataSnapshot
@@ -24,6 +30,11 @@ import com.google.firebase.database.ktx.getValue
 
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        private const val FIRE_CHANNEL_ID = "fire_alert_channel"
+        private const val FIRE_NOTIFICATION_ID = 1
+    }
 
     private lateinit var mainStatus: TextView
     private lateinit var fireStatus: TextView
@@ -54,6 +65,9 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        // creates notis channel
+        createNotificationChannel()
+
         val fireTile = findViewById<CardView>(R.id.fireTile)
         val gasTile = findViewById<CardView>(R.id.gasTile)
         val floodTile = findViewById<CardView>(R.id.floodTile)
@@ -83,6 +97,10 @@ class MainActivity : AppCompatActivity() {
                 val fireStatusData = snapshot.child("status").getValue(String::class.java)
 
                 updateFireStatus(fireStatusData)
+
+                if (fireStatusData == "fire detected") {
+                    sendFireNotification()
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -164,6 +182,35 @@ class MainActivity : AppCompatActivity() {
         }
 
         }
+
+    private fun createNotificationChannel() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Fire Alerts"
+            val descriptionText = "Notifications for fire events"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(FIRE_CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun sendFireNotification() {
+        val notificationBuilder = NotificationCompat.Builder(this, FIRE_CHANNEL_ID)
+            .setSmallIcon(R.drawable.icon_fire) // Replace with your app's fire icon
+            .setContentTitle("Fire Alert!")
+            .setContentText("Possible fire detected in your home. Tap to view live feed.")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // send notification
+        notificationManager.notify(FIRE_NOTIFICATION_ID, notificationBuilder.build())
+    }
 
     private fun updateTempStatus(temperature: Double) {
         // update temp status from values
