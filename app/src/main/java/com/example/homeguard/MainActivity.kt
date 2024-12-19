@@ -347,10 +347,10 @@ class MainActivity : AppCompatActivity() {
 
         when {
             temperature <= 10 -> {
-                sendTemperatureNotification("Temperature is too low! It's $temperature°C.")
+                sendTemperatureNotification("Temperature is too low! $temperature°C. Tap to view more.")
             }
             temperature >= 30 -> {
-                sendTemperatureNotification("Temperature is too high! It's $temperature°C.")
+                sendTemperatureNotification("Temperature is too high! $temperature°C. Tap to view more.")
             }
         }
     }
@@ -382,7 +382,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (level >= 75) {
-            sendGasNotification("Gas levels are very high! $level%. Immediate action required!")
+            sendGasNotification("Gas levels are high! $level%. Immediate action required!")
         }
     }
 
