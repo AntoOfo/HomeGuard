@@ -41,6 +41,9 @@ class MainActivity : AppCompatActivity() {
 
         private const val GAS_CHANNEL_ID = "gas_alert_channel"
         private const val GAS_NOTIFICATION_ID = 3
+
+        private const val FLOOD_CHANNEL_ID = "flood_alert_channel"
+        private const val FLOOD_NOTIFICATION_ID = 4
     }
 
     private lateinit var mainStatus: TextView
@@ -99,6 +102,10 @@ class MainActivity : AppCompatActivity() {
         val openGasDialog = intent.getBooleanExtra("openGasDialog", false)
         if (openGasDialog) {
             showGasDetailsDialog()
+        }
+        val openFloodDialog = intent.getBooleanExtra("openFloodDialog", false)
+        if (openFloodDialog) {
+            showFloodDetailsDialog()
         }
         
         // firebase db references
@@ -221,11 +228,18 @@ class MainActivity : AppCompatActivity() {
             val gasChannel = NotificationChannel(GAS_CHANNEL_ID, gasName, gasImportance).apply {
                 description = gasDescription
             }
+            val floodName = "Flood Alerts"
+            val floodDescription = "Notifications for flood warnings"
+            val floodImportance = NotificationManager.IMPORTANCE_HIGH
+            val floodChannel = NotificationChannel(FLOOD_CHANNEL_ID, floodName, floodImportance).apply {
+                description = floodDescription
+            }
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(fireChannel)
             notificationManager.createNotificationChannel(tempChannel)
             notificationManager.createNotificationChannel(gasChannel)
+            notificationManager.createNotificationChannel(floodChannel)
         }
     }
 
@@ -300,6 +314,29 @@ class MainActivity : AppCompatActivity() {
         notificationManager.notify(GAS_NOTIFICATION_ID, notificationBuilder.build())
     }
 
+    private fun sendFloodNotification(level: Double) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra("openFloodDialog", true)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notificationBuilder = NotificationCompat.Builder(this, FLOOD_CHANNEL_ID)
+            .setSmallIcon(R.drawable.icon_flood)
+            .setContentTitle("Flood Alert!")
+            .setContentText("Water level is $level%. Tap to view details.")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(FLOOD_NOTIFICATION_ID, notificationBuilder.build())
+    }
+
     private fun updateTempStatus(temperature: Double) {
         // update temp status from values
         tempStatus.text = when {
@@ -330,6 +367,10 @@ class MainActivity : AppCompatActivity() {
             level < 25 -> "Low"
             level in 25.0..75.0 -> "Moderate"
             else -> "High"
+        }
+
+        if (level >= 25) {
+            sendFloodNotification(level)
         }
     }
 
