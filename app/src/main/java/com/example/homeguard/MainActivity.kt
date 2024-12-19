@@ -2,6 +2,7 @@ package com.example.homeguard
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -34,6 +35,12 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val FIRE_CHANNEL_ID = "fire_alert_channel"
         private const val FIRE_NOTIFICATION_ID = 1
+
+        private const val TEMP_CHANNEL_ID = "temperature_alert_channel"
+        private const val TEMP_NOTIFICATION_ID = 2
+
+        private const val GAS_CHANNEL_ID = "gas_alert_channel"
+        private const val GAS_NOTIFICATION_ID = 3
     }
 
     private lateinit var mainStatus: TextView
@@ -68,6 +75,8 @@ class MainActivity : AppCompatActivity() {
         // creates notis channel
         createNotificationChannel()
 
+        sendTemperatureNotification("Temperature is too low!")
+
         val fireTile = findViewById<CardView>(R.id.fireTile)
         val gasTile = findViewById<CardView>(R.id.gasTile)
         val floodTile = findViewById<CardView>(R.id.floodTile)
@@ -84,6 +93,15 @@ class MainActivity : AppCompatActivity() {
         floodStatus.text = "Low"
         tempStatus = findViewById(R.id.temperatureStatus)
         tempStatus.text = "Normal"
+
+        val openTempDialog = intent.getBooleanExtra("openTempDialog", false)
+        if (openTempDialog) {
+            showTempDetailsDialog()
+        }
+        val openGasDialog = intent.getBooleanExtra("openGasDialog", false)
+        if (openGasDialog) {
+            showGasDetailsDialog()
+        }
         
         // firebase db references
         tempRef = FirebaseDatabase.getInstance().getReference("sensors/temperature")
@@ -186,30 +204,95 @@ class MainActivity : AppCompatActivity() {
     private fun createNotificationChannel() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Fire Alerts"
-            val descriptionText = "Notifications for fire events"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(FIRE_CHANNEL_ID, name, importance).apply {
-                description = descriptionText
+
+            val fireName = "Fire Alerts"
+            val fireDescription = "Notifications for fire events"
+            val fireImportance = NotificationManager.IMPORTANCE_HIGH
+            val fireChannel = NotificationChannel(FIRE_CHANNEL_ID, fireName, fireImportance).apply {
+                description = fireDescription
+            }
+            val tempName = "Temperature Alerts"
+            val tempDescription = "Notifications for temperature changes"
+            val tempImportance = NotificationManager.IMPORTANCE_HIGH
+            val tempChannel = NotificationChannel(TEMP_CHANNEL_ID, tempName, tempImportance).apply {
+                description = tempDescription
             }
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(fireChannel)
+            notificationManager.createNotificationChannel(tempChannel)
         }
     }
 
     private fun sendFireNotification() {
+        // intent to open camera feed
+        val intent = Intent(this, CameraFeedActivity::class.java)
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notificationBuilder = NotificationCompat.Builder(this, FIRE_CHANNEL_ID)
             .setSmallIcon(R.drawable.icon_fire) // Replace with your app's fire icon
             .setContentTitle("Fire Alert!")
             .setContentText("Possible fire detected in your home. Tap to view live feed.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // send notification
         notificationManager.notify(FIRE_NOTIFICATION_ID, notificationBuilder.build())
+    }
+
+    private fun sendTemperatureNotification(message: String) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra("openTempDialog", true)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notificationBuilder = NotificationCompat.Builder(this, TEMP_CHANNEL_ID)
+            .setSmallIcon(R.drawable.icon_temperature)
+            .setContentTitle("Temperature Alert!")
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(TEMP_NOTIFICATION_ID, notificationBuilder.build())
+    }
+
+    private fun sendGasNotification(message: String) {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra("openGasDialog", true)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notificationBuilder = NotificationCompat.Builder(this, "gas_alert_channel")
+            .setSmallIcon(R.drawable.icon_gas)
+            .setContentTitle("Gas Alert!")
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(GAS_NOTIFICATION_ID, notificationBuilder.build())
     }
 
     private fun updateTempStatus(temperature: Double) {
@@ -218,6 +301,15 @@ class MainActivity : AppCompatActivity() {
             temperature < 10 -> "Low"
             temperature in 10.0..30.0 -> "Normal"
             else -> "High"
+        }
+
+        when {
+            temperature <= 10 -> {
+                sendTemperatureNotification("Temperature is too low! It's $temperature°C.")
+            }
+            temperature >= 30 -> {
+                sendTemperatureNotification("Temperature is too high! It's $temperature°C.")
+            }
         }
     }
 
@@ -241,6 +333,10 @@ class MainActivity : AppCompatActivity() {
             level < 25 -> "Safe"
             level in 25.0..75.0 -> "Warning"
             else -> "Danger"
+        }
+
+        if (level >= 75) {
+            sendGasNotification("Gas levels are very high! $level%. Immediate action required!")
         }
     }
 
