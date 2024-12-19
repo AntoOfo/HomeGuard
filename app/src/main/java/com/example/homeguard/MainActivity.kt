@@ -75,8 +75,6 @@ class MainActivity : AppCompatActivity() {
         // creates notis channel
         createNotificationChannel()
 
-        sendTemperatureNotification("Temperature is too low!")
-
         val fireTile = findViewById<CardView>(R.id.fireTile)
         val gasTile = findViewById<CardView>(R.id.gasTile)
         val floodTile = findViewById<CardView>(R.id.floodTile)
@@ -217,10 +215,17 @@ class MainActivity : AppCompatActivity() {
             val tempChannel = NotificationChannel(TEMP_CHANNEL_ID, tempName, tempImportance).apply {
                 description = tempDescription
             }
+            val gasName = "Gas Alerts"
+            val gasDescription = "Notifications for gas level changes"
+            val gasImportance = NotificationManager.IMPORTANCE_HIGH
+            val gasChannel = NotificationChannel(GAS_CHANNEL_ID, gasName, gasImportance).apply {
+                description = gasDescription
+            }
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(fireChannel)
             notificationManager.createNotificationChannel(tempChannel)
+            notificationManager.createNotificationChannel(gasChannel)
         }
     }
 
