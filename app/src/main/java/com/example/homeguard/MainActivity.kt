@@ -206,6 +206,29 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+    private fun updateMainStatus() {
+        val dangers = mutableListOf<String>()
+
+        if (fireStatus.text == "Warning") {
+            dangers.add("Fire")
+        }
+        if (gasStatus.text == "Warning") {
+            dangers.add("Gas")
+        }
+        if (tempStatus.text == "Warning") {
+            dangers.add("Temperature")
+        }
+        if (floodStatus.text == "Warning") {
+            dangers.add("Flood")
+        }
+
+        mainStatus.text = when {
+            dangers.isEmpty() -> "All Systems Normal"
+            dangers.size == 1 -> "${dangers[0]} Detected"
+            else -> "Multiple Dangers Detected: ${dangers.joinToString(", ")}"
+        }
+    }
+
     private fun createNotificationChannel() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -353,6 +376,7 @@ class MainActivity : AppCompatActivity() {
                 sendTemperatureNotification("Temperature is too high! $temperature°C. Tap to view more.")
             }
         }
+        updateMainStatus()
     }
 
     private fun updateFireStatus(fireStatusData: String?) {
@@ -360,6 +384,7 @@ class MainActivity : AppCompatActivity() {
             "fire detected" -> "Warning"
             else -> "Safe"
         }
+        updateMainStatus()
     }
 
     private fun updateFloodStatus(level: Double) {
@@ -372,6 +397,7 @@ class MainActivity : AppCompatActivity() {
         if (level >= 25) {
             sendFloodNotification(level)
         }
+        updateMainStatus()
     }
 
     private fun updateGasStatus(level: Double) {
@@ -384,6 +410,7 @@ class MainActivity : AppCompatActivity() {
         if (level >= 75) {
             sendGasNotification("Gas levels are high! $level%. Immediate action required!")
         }
+        updateMainStatus()
     }
 
 
