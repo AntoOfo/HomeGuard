@@ -41,6 +41,7 @@ class CameraFeedActivity : AppCompatActivity() {
                 when (fireStatusData) {
                     "fire detected" -> {
                         fireStatus.text = "Possible Fire"
+                        fireAdviceText.text = "Fire detected in your area. Consider contacting emergency services if necessary."
                         // Keep fire advice text as it is
                     }
                     else -> {
