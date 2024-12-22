@@ -16,7 +16,7 @@
         android:fontFamily="@font/days_one"
         android:text="HOMEGUARD"
         android:textColor="#FFFFFF"
-        android:textSize="24sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -27,25 +27,14 @@
         android:id="@+id/statusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="40dp"
         android:fontFamily="sans-serif-medium"
-        android:text="Status: All Systems Normal"
+        android:text="All Systems Normal"
         android:textColor="#B0B0B0"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleText" />
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="409dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="32dp"
-        android:background="#B0B0B0"
-        android:scaleY="3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/statusText" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/gasTile"
@@ -98,7 +87,7 @@
         android:id="@+id/floodTile"
         android:layout_width="372dp"
         android:layout_height="74dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         app:cardBackgroundColor="#1F1F1F"
         app:cardCornerRadius="18dp"
         app:cardElevation="4dp"
@@ -194,14 +183,14 @@
         android:id="@+id/monitorBtn"
         android:layout_width="364dp"
         android:layout_height="48dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#757575"
         android:fontFamily="sans-serif-black"
         android:text="View Sensor Readings"
-        android:backgroundTint="#757575"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintHorizontal_bias="0.489"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/temperatureTile" />
 
@@ -209,14 +198,14 @@
         android:id="@+id/fireTile"
         android:layout_width="372dp"
         android:layout_height="74dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="51dp"
         app:cardBackgroundColor="#1F1F1F"
         app:cardCornerRadius="18dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider">
+        app:layout_constraintTop_toBottomOf="@+id/statusText">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linearLayout4"
@@ -255,34 +244,34 @@
     <ImageView
         android:id="@+id/settingsBtn"
         android:layout_width="54dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="96dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="84dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/phoneBtn"
         app:layout_constraintTop_toBottomOf="@+id/monitorBtn"
-        app:layout_constraintVertical_bias="0.42"
-        app:srcCompat="@drawable/settingsicon" />
+        app:layout_constraintVertical_bias="0.692"
+        app:srcCompat="@drawable/icon_settings" />
 
     <ImageView
         android:id="@+id/phoneBtn"
-        android:layout_width="54dp"
-        android:layout_height="52dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginBottom="36dp"
+        android:layout_width="52dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/stat_sys_phone_call_on_hold" />
+        app:srcCompat="@drawable/icon_phone" />
 
     <ImageView
         android:id="@+id/helpBtn"
-        android:layout_width="58dp"
-        android:layout_height="58dp"
-        android:layout_marginBottom="32dp"
+        android:layout_width="52dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.595"
+        app:layout_constraintHorizontal_bias="0.643"
         app:layout_constraintStart_toEndOf="@+id/settingsBtn"
-        app:srcCompat="@android:drawable/ic_menu_help" />
+        app:srcCompat="@drawable/icon_info" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

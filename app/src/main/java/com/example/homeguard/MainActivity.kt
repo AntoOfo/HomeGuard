@@ -85,15 +85,15 @@ class MainActivity : AppCompatActivity() {
         val callBtn = findViewById<ImageView>(R.id.phoneBtn)
 
         mainStatus = findViewById(R.id.statusText)
-        mainStatus.text = "Status: All Systems Normal"
+        mainStatus.text = "All Systems Normal"
         fireStatus = findViewById(R.id.fireStatus)
-        fireStatus.text = "No"
+        fireStatus.text = "Safe"
         gasStatus = findViewById(R.id.gasStatus)
         gasStatus.text = "Safe"
         floodStatus = findViewById(R.id.floodStatus)
-        floodStatus.text = "Low"
+        floodStatus.text = "Safe"
         tempStatus = findViewById(R.id.temperatureStatus)
-        tempStatus.text = "Normal"
+        tempStatus.text = "Safe"
 
         val openTempDialog = intent.getBooleanExtra("openTempDialog", false)
         if (openTempDialog) {
@@ -340,16 +340,16 @@ class MainActivity : AppCompatActivity() {
     private fun updateTempStatus(temperature: Double) {
         // update temp status from values
         tempStatus.text = when {
-            temperature < 10 -> "Low"
-            temperature in 10.0..30.0 -> "Normal"
-            else -> "High"
+            temperature < 10  -> "Warning"
+            temperature in 10.0..25.0 -> "Safe"
+            else -> "Warning"
         }
 
         when {
             temperature <= 10 -> {
                 sendTemperatureNotification("Temperature is too low! $temperature°C. Tap to view more.")
             }
-            temperature >= 30 -> {
+            temperature >= 25 -> {
                 sendTemperatureNotification("Temperature is too high! $temperature°C. Tap to view more.")
             }
         }
@@ -357,16 +357,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateFireStatus(fireStatusData: String?) {
         fireStatus.text = when (fireStatusData) {
-            "fire detected" -> "Yes"
-            else -> "No"
+            "fire detected" -> "Warning"
+            else -> "Safe"
         }
     }
 
     private fun updateFloodStatus(level: Double) {
         floodStatus.text = when {
-            level < 25 -> "Low"
-            level in 25.0..75.0 -> "Moderate"
-            else -> "High"
+            level < 25 -> "Safe"
+            level in 25.0..75.0 -> "Warning"
+            else -> "Warning"
         }
 
         if (level >= 25) {
@@ -378,7 +378,7 @@ class MainActivity : AppCompatActivity() {
         gasStatus.text = when {
             level < 25 -> "Safe"
             level in 25.0..75.0 -> "Warning"
-            else -> "Danger"
+            else -> "Warning"
         }
 
         if (level >= 75) {
