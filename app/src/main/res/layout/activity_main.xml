@@ -245,33 +245,33 @@
         android:id="@+id/settingsBtn"
         android:layout_width="54dp"
         android:layout_height="54dp"
-        android:layout_marginStart="84dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toStartOf="@+id/helpBtn"
+        app:layout_constraintHorizontal_bias="0.025"
         app:layout_constraintStart_toEndOf="@+id/phoneBtn"
         app:layout_constraintTop_toBottomOf="@+id/monitorBtn"
-        app:layout_constraintVertical_bias="0.692"
         app:srcCompat="@drawable/icon_settings" />
-
-    <ImageView
-        android:id="@+id/phoneBtn"
-        android:layout_width="52dp"
-        android:layout_height="49dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/icon_phone" />
 
     <ImageView
         android:id="@+id/helpBtn"
         android:layout_width="52dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="40dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.643"
-        app:layout_constraintStart_toEndOf="@+id/settingsBtn"
+        app:layout_constraintTop_toBottomOf="@+id/monitorBtn"
         app:srcCompat="@drawable/icon_info" />
+
+    <ImageView
+        android:id="@+id/phoneBtn"
+        android:layout_width="52dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/monitorBtn"
+        app:srcCompat="@drawable/icon_phone" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
