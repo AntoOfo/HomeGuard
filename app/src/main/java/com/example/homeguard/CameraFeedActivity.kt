@@ -17,6 +17,7 @@ import com.google.firebase.database.ValueEventListener
 
 class CameraFeedActivity : AppCompatActivity() {
 
+    // ui components and firebase reference
     private lateinit var camWebView: WebView
     private lateinit var fireStatus: TextView
     private lateinit var fireRef: DatabaseReference
@@ -32,20 +33,23 @@ class CameraFeedActivity : AppCompatActivity() {
         fireAdviceText = findViewById(R.id.fireAdviceText)
         val backBtn = findViewById<Button>(R.id.backBtnFire)
 
+        // initialising firebase db reference
         fireRef = FirebaseDatabase.getInstance().getReference("sensors/fire_detection")
 
+        // loading video feed url
         val videoUrl = "http://192.168.1.178:5000/video_feed"
         camWebView.loadUrl(videoUrl)
 
         // firebase listener
         fireRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                // get fire status data from db
                 val fireStatusData = snapshot.child("status").getValue(String::class.java)
+
                 when (fireStatusData) {
                     "fire detected" -> {
                         fireStatus.text = "Possible Fire"
                         fireAdviceText.text = "Fire detected in your area. Consider contacting emergency services if necessary."
-                        // Keep fire advice text as it is
                     }
                     else -> {
                         fireStatus.text = "No Fire Detected"
@@ -63,7 +67,5 @@ class CameraFeedActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
-
-        }
-
     }
+}
