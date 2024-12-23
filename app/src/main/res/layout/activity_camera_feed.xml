@@ -8,24 +8,32 @@
     android:background="#121212"
     tools:context=".CameraFeedActivity">
 
-    <WebView
-        android:id="@+id/camWebView"
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="411dp"
         android:layout_height="309dp"
         android:layout_marginTop="32dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cameraTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/cameraTitle">
+
+        <WebView
+            android:id="@+id/camWebView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/fireAdviceText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="48dp"
         android:text="Please investigate immediately!"
-        android:textSize="16sp"
         android:textColor="#B0B0B0"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/firefeedStatus" />
@@ -36,11 +44,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
         android:text="Status: Possible"
-        android:textSize="16sp"
         android:textColor="#B0B0B0"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/camWebView" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
     <Button
         android:id="@+id/backBtnFire"
@@ -53,10 +61,8 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fireAdviceText"
-        app:layout_constraintVertical_bias="0.623" />
+        app:layout_constraintTop_toBottomOf="@+id/fireAdviceText" />
 
     <TextView
         android:id="@+id/cameraTitle"
@@ -65,9 +71,9 @@
         android:layout_marginTop="64dp"
         android:fontFamily="sans-serif-medium"
         android:text="Camera Feed"
+        android:textColor="#B0B0B0"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:textColor="#B0B0B0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

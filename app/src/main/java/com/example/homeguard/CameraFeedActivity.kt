@@ -1,7 +1,9 @@
 package com.example.homeguard
 
+import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebView
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +30,7 @@ class CameraFeedActivity : AppCompatActivity() {
         fireStatus = findViewById<TextView>(R.id.firefeedStatus)
         camWebView = findViewById(R.id.camWebView)
         fireAdviceText = findViewById(R.id.fireAdviceText)
+        val backBtn = findViewById<Button>(R.id.backBtnFire)
 
         fireRef = FirebaseDatabase.getInstance().getReference("sensors/fire_detection")
 
@@ -55,6 +58,12 @@ class CameraFeedActivity : AppCompatActivity() {
 
             }
         })
+
+        backBtn.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
         }
 
     }
