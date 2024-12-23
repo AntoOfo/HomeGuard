@@ -5,19 +5,32 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.health.connect.datatypes.ExerciseRoute
+import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.view.ViewGroup
+import android.Manifest
+import android.database.Cursor
+import android.location.LocationListener
+import android.net.Uri
+import android.provider.ContactsContract
+import android.provider.Settings
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
@@ -32,6 +45,7 @@ import com.google.firebase.database.ktx.getValue
 
 class MainActivity : AppCompatActivity() {
 
+    // companion objects to store noti channels & ids
     companion object {
         private const val FIRE_CHANNEL_ID = "fire_alert_channel"
         private const val FIRE_NOTIFICATION_ID = 1
@@ -46,6 +60,17 @@ class MainActivity : AppCompatActivity() {
         private const val FLOOD_NOTIFICATION_ID = 4
     }
 
+    // permission request codes
+    private val SMS_PERMISSION_REQUEST = 101
+    private val LOCATION_PERMISSION_REQUEST_CODE = 102
+    private val CONTACT_PICKER_REQUEST = 1
+
+    // location properties
+    private lateinit var locationManager: LocationManager
+    private var lastKnownLocation: Location? = null
+    private var locationListener: LocationListener? = null
+
+    // ui elements (statuses)
     private lateinit var mainStatus: TextView
     private lateinit var fireStatus: TextView
     private lateinit var gasStatus: TextView
@@ -59,11 +84,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gasRef: DatabaseReference
     private lateinit var fireRef: DatabaseReference
 
+    // sensor values
     private var humidity: Double = 0.0
     private var temp: Double = 0.0
     private var waterLevel: Double = 0.0
     private var gasLevel: Double = 0.0
 
+    // dialogs for additional details
     private var tempDialog: AlertDialog? = null
     private lateinit var dialogMessage: TextView
     private var gasDialog: AlertDialog? = null
@@ -78,16 +105,22 @@ class MainActivity : AppCompatActivity() {
         // creates notis channel
         createNotificationChannel()
 
+        // initialise location manager to track device lcoation
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        setupLocationUpdates()
+
+        // ui elements
         val fireTile = findViewById<CardView>(R.id.fireTile)
         val gasTile = findViewById<CardView>(R.id.gasTile)
         val floodTile = findViewById<CardView>(R.id.floodTile)
         val tempTile = findViewById<CardView>(R.id.temperatureTile)
         val callBtn = findViewById<ImageView>(R.id.phoneBtn)
+        val sendBtn = findViewById<Button>(R.id.sendBtn)
 
         mainStatus = findViewById(R.id.statusText)
-        mainStatus.text = "All Systems Normal"
+        mainStatus.text = "All Systems Normal"  // default main status
         fireStatus = findViewById(R.id.fireStatus)
-        fireStatus.text = "Safe"
+        fireStatus.text = "Safe"  // default fire status
         gasStatus = findViewById(R.id.gasStatus)
         gasStatus.text = "Safe"
         floodStatus = findViewById(R.id.floodStatus)
@@ -95,6 +128,7 @@ class MainActivity : AppCompatActivity() {
         tempStatus = findViewById(R.id.temperatureStatus)
         tempStatus.text = "Safe"
 
+        // check if certain dialogs to be shown based on intent extras
         val openTempDialog = intent.getBooleanExtra("openTempDialog", false)
         if (openTempDialog) {
             showTempDetailsDialog()
@@ -107,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         if (openFloodDialog) {
             showFloodDetailsDialog()
         }
-        
+
         // firebase db references
         tempRef = FirebaseDatabase.getInstance().getReference("sensors/temperature")
         humidityRef = FirebaseDatabase.getInstance().getReference("sensors/humidity")
@@ -115,6 +149,7 @@ class MainActivity : AppCompatActivity() {
         gasRef = FirebaseDatabase.getInstance().getReference("sensors/gas")
         fireRef = FirebaseDatabase.getInstance().getReference("sensors/fire_detection")
 
+        // listen for fire updates on firebase
         fireRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val fireStatusData = snapshot.child("status").getValue(String::class.java)
@@ -130,7 +165,7 @@ class MainActivity : AppCompatActivity() {
 
             }
         })
-        // read temp from firebase
+        // listen for temp updates on firebase
         tempRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 // get value for temp
@@ -138,14 +173,14 @@ class MainActivity : AppCompatActivity() {
 
                 updateTempStatus(temp)
                 updateDialog()
-                }
+            }
 
             override fun onCancelled(error: DatabaseError) {
                 TODO("Not yet implemented")
             }
         })
 
-        // read humidity from firebase
+        // listen for humidity updates on firebase
         humidityRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 humidity = snapshot.child("value").getValue(Double::class.java) ?: 0.0
@@ -153,11 +188,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Handle errors if needed
+
             }
         })
 
-        // read water level from firebase
+        // listen for flood updates on firebase
         waterLevelRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 waterLevel = snapshot.child("value").getValue(Double::class.java) ?: 0.0
@@ -169,7 +204,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // read gas level from firebase
+        // listen for gas updates on firebase
         gasRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 gasLevel = snapshot.child("value").getValue(Double::class.java) ?: 0.0
@@ -180,37 +215,172 @@ class MainActivity : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {}
         })
 
-        tempTile.setOnClickListener {
-            showTempDetailsDialog()
-        }
+        // on click listeners for tiles and buttons
+        tempTile.setOnClickListener { showTempDetailsDialog() }
 
         fireTile.setOnClickListener {
             val intent = Intent(this, CameraFeedActivity::class.java)
             startActivity(intent)
         }
 
-        gasTile.setOnClickListener {
-            showGasDetailsDialog()
-        }
+        gasTile.setOnClickListener { showGasDetailsDialog() }
 
-        floodTile.setOnClickListener {
-
-            showFloodDetailsDialog()
-        }
-
+        floodTile.setOnClickListener { showFloodDetailsDialog() }
 
         callBtn.setOnClickListener {
             val intent = Intent(this, EmergencyServicesActivity::class.java)
             startActivity(intent)
         }
 
+        sendBtn.setOnClickListener {
+            // check sms/location perms before sending
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.SEND_SMS),
+                    SMS_PERMISSION_REQUEST)
+            } else {
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                    // request location permissions if not granted
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                        LOCATION_PERMISSION_REQUEST_CODE
+                    )
+                } else {
+                    // if both are given, continue
+                    val intent =
+                        Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                    startActivityForResult(intent, CONTACT_PICKER_REQUEST)
+                }
+            }
+        }
+    }
+
+    // set up location updates with location manager
+    private fun setupLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationListener = object : LocationListener {
+                override fun onLocationChanged(location: Location) {
+                    lastKnownLocation = location  // update last known location
+                }
+                override fun onProviderDisabled(provider: String) {}
+                override fun onProviderEnabled(provider: String) {}
+                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+            }
+
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                5000, // update every 5 seconds
+                10f,  // or when device moves 10m
+                locationListener!!
+            )
+        }
+    }
+
+        // deals with result of the contact picker
+        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+            if (requestCode == CONTACT_PICKER_REQUEST && resultCode == RESULT_OK) {
+                val contactUri: Uri? = data?.data
+                val cursor: Cursor? = contentResolver.query(contactUri!!, null, null, null, null)
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    val phoneNumberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    val phoneNumber = cursor.getString(phoneNumberIndex)
+
+                    sendStatusAndLocation(phoneNumber)  // send status and location to contact
+                }
+                cursor?.close()
+            }
         }
 
+    // send current status/location to number
+    private fun sendStatusAndLocation(phoneNumber: String) {
+        val statusMessage = "HomeGuard Status:\n" +
+                "Fire: ${fireStatus.text}\n" +
+                "Gas: ${gasStatus.text}\n" +
+                "Flood: ${floodStatus.text}\n" +
+                "Temperature: ${tempStatus.text}"
+
+        // check location permissions
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            // make sure gps is enabled
+            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                Toast.makeText(this, "Please enable GPS", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                return
+            }
+
+            // get last known gps location
+            lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+
+            // if location is available, include it in message
+            lastKnownLocation?.let {
+                val locationMessage = "Location: https://maps.google.com/?q=${it.latitude},${it.longitude}"
+                sendSms(phoneNumber, "$statusMessage\n\n$locationMessage") // Replace with the desired phone number
+            } ?: run {
+                Toast.makeText(this, "Unable to get location.", Toast.LENGTH_SHORT).show()
+                sendSms(phoneNumber, statusMessage) // send status without location
+            }
+        } else {
+            Toast.makeText(this, "Location permission not granted.", Toast.LENGTH_SHORT).show()
+            sendSms(phoneNumber, statusMessage) // send status without location
+        }
+    }
+
+    // send sms to number
+    private fun sendSms(phoneNumber: String, message: String) {
+        try {
+            val smsManager = SmsManager.getDefault()
+            // send sms
+            smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+            Toast.makeText(this, "Status sent successfully.", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Failed to send status", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // handle result of perms request
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == SMS_PERMISSION_REQUEST) {
+            // checks if sms perms are granted
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            } else {
+                Toast.makeText(this, "SMS permission denied.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            // check if location perms are granted
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sendStatusAndLocation("phoneNumber")
+            } else {
+                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // update main status based off different detections
     private fun updateMainStatus() {
         val dangers = mutableListOf<String>()
 
         if (fireStatus.text == "Warning") {
-            dangers.add("Fire")
+            dangers.add("Fire")  // add to list
         }
         if (gasStatus.text == "Warning") {
             dangers.add("Gas")
@@ -223,12 +393,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainStatus.text = when {
-            dangers.isEmpty() -> "All Systems Normal"
-            dangers.size == 1 -> "${dangers[0]} Detected"
-            else -> "Multiple Dangers Detected: ${dangers.joinToString(", ")}"
+            dangers.isEmpty() -> "All Systems Normal"  // no dangers detected
+            dangers.size == 1 -> "${dangers[0]} Detected"  // single danger detected
+            else -> "Multiple Dangers Detected: ${dangers.joinToString(", ")}"  // multiple dangers detected
         }
     }
 
+    // notis channel for different alert types
     private fun createNotificationChannel() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -257,6 +428,8 @@ class MainActivity : AppCompatActivity() {
             val floodChannel = NotificationChannel(FLOOD_CHANNEL_ID, floodName, floodImportance).apply {
                 description = floodDescription
             }
+
+            // register channels with system
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(fireChannel)
@@ -266,6 +439,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // send fire alert notification
     private fun sendFireNotification() {
         // intent to open camera feed
         val intent = Intent(this, CameraFeedActivity::class.java)
@@ -277,8 +451,9 @@ class MainActivity : AppCompatActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        // properties of notification
         val notificationBuilder = NotificationCompat.Builder(this, FIRE_CHANNEL_ID)
-            .setSmallIcon(R.drawable.icon_fire) // Replace with your app's fire icon
+            .setSmallIcon(R.drawable.icon_fire)
             .setContentTitle("Fire Alert!")
             .setContentText("Possible fire detected in your home. Tap to view live feed.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -291,7 +466,9 @@ class MainActivity : AppCompatActivity() {
         notificationManager.notify(FIRE_NOTIFICATION_ID, notificationBuilder.build())
     }
 
+    // sends temp alert notification
     private fun sendTemperatureNotification(message: String) {
+        // intent to open temp dialog
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("openTempDialog", true)
         }
@@ -302,6 +479,7 @@ class MainActivity : AppCompatActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        // properties of noti
         val notificationBuilder = NotificationCompat.Builder(this, TEMP_CHANNEL_ID)
             .setSmallIcon(R.drawable.icon_temperature)
             .setContentTitle("Temperature Alert!")
@@ -311,10 +489,13 @@ class MainActivity : AppCompatActivity() {
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // send noti
         notificationManager.notify(TEMP_NOTIFICATION_ID, notificationBuilder.build())
     }
 
+    // sends gas alert notification
     private fun sendGasNotification(message: String) {
+        // intent to open gas dialog
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("openGasDialog", true)
         }
@@ -325,6 +506,7 @@ class MainActivity : AppCompatActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        // properties of gas noti
         val notificationBuilder = NotificationCompat.Builder(this, "gas_alert_channel")
             .setSmallIcon(R.drawable.icon_gas)
             .setContentTitle("Gas Alert!")
@@ -334,10 +516,13 @@ class MainActivity : AppCompatActivity() {
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // send noti
         notificationManager.notify(GAS_NOTIFICATION_ID, notificationBuilder.build())
     }
 
+    // sends flood alert noti
     private fun sendFloodNotification(level: Double) {
+        // intent to open flood dialog
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("openFloodDialog", true)
         }
@@ -348,6 +533,7 @@ class MainActivity : AppCompatActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        // properties of noti
         val notificationBuilder = NotificationCompat.Builder(this, FLOOD_CHANNEL_ID)
             .setSmallIcon(R.drawable.icon_flood)
             .setContentTitle("Flood Alert!")
@@ -357,11 +543,12 @@ class MainActivity : AppCompatActivity() {
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // send noti
         notificationManager.notify(FLOOD_NOTIFICATION_ID, notificationBuilder.build())
     }
 
+    // updates temp status and triggers notis if needed
     private fun updateTempStatus(temperature: Double) {
-        // update temp status from values
         tempStatus.text = when {
             temperature < 10  -> "Warning"
             temperature in 10.0..25.0 -> "Safe"
@@ -379,6 +566,7 @@ class MainActivity : AppCompatActivity() {
         updateMainStatus()
     }
 
+    // update fire status
     private fun updateFireStatus(fireStatusData: String?) {
         fireStatus.text = when (fireStatusData) {
             "fire detected" -> "Warning"
@@ -387,6 +575,7 @@ class MainActivity : AppCompatActivity() {
         updateMainStatus()
     }
 
+    // update flood status and send notis if necessary
     private fun updateFloodStatus(level: Double) {
         floodStatus.text = when {
             level < 25 -> "Safe"
@@ -400,6 +589,7 @@ class MainActivity : AppCompatActivity() {
         updateMainStatus()
     }
 
+    // update gas status and sends notis if needed
     private fun updateGasStatus(level: Double) {
         gasStatus.text = when {
             level < 25 -> "Safe"
@@ -413,16 +603,17 @@ class MainActivity : AppCompatActivity() {
         updateMainStatus()
     }
 
-
+    // displays dialog with temp details
     private fun showTempDetailsDialog() {
-
+        // creates dialog if it hasnt been created
         if (tempDialog == null) {
-            // build the dialog only if it hasn't been created
             val builder = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.dialog_temperature_details, null)
+
             dialogMessage = dialogView.findViewById(R.id.dialogMessage)
             val closeBtn = dialogView.findViewById<TextView>(R.id.closeBtn)
 
+            // builds dialog with properties
             builder.setView(dialogView)
             tempDialog = builder.create()
             tempDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -441,8 +632,8 @@ class MainActivity : AppCompatActivity() {
         updateDialog()
     }
 
+    // update temp details in dialog
     private fun updateDialog() {
-        // This method updates the dialog with the latest temperature and humidity
         if (::dialogMessage.isInitialized) {
             val status = when {
                 temp < 10 -> "Low Temperature"
@@ -450,12 +641,14 @@ class MainActivity : AppCompatActivity() {
                 else -> "High Temperature"
             }
 
+            // update dialog message
             dialogMessage.text = "Current temperature: $temp°C\n" +
                     "Humidity level: $humidity%\n" +
                     "Status: $status"
         }
     }
 
+    // update gas details in dialog
     private fun updateGasDialog() {
         if (::gasMessage.isInitialized) {
             val gasStatusText = when {
@@ -464,12 +657,13 @@ class MainActivity : AppCompatActivity() {
                 else -> "Critical Alert! High gas levels detected - Immediate action needed!"
             }
 
+            // update dialog message
             gasMessage.text = "Gas Level: ${gasLevel}%\nStatus: $gasStatusText"  // Update dialog message
         }
     }
 
+    // update flood details in dialog
     private fun showFloodDetailsDialog() {
-
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_flood_details, null)
 
@@ -485,6 +679,7 @@ class MainActivity : AppCompatActivity() {
             else -> "High - Risk of flooding!"
         }
 
+        // set flood message
         floodMessage.text = "Level: ${waterLevel}%\nStatus: $waterLevelStatus"
 
         builder.setView(dialogView)
@@ -500,9 +695,9 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    // update gas details in dialog
     private fun showGasDetailsDialog() {
-
-        if (gasDialog == null) {  // Only create the dialog if it hasn't been created
+        if (gasDialog == null) {
             val builder = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.dialog_gas_details, null)
 
@@ -524,8 +719,6 @@ class MainActivity : AppCompatActivity() {
         if (gasDialog?.isShowing == false) {
             gasDialog?.show()
         }
-
-        // Initial call to update with current data
         updateGasDialog()
     }
     }

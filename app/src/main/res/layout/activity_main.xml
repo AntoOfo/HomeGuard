@@ -180,13 +180,13 @@
     </androidx.cardview.widget.CardView>
 
     <Button
-        android:id="@+id/monitorBtn"
+        android:id="@+id/sendBtn"
         android:layout_width="364dp"
         android:layout_height="48dp"
         android:layout_marginTop="24dp"
         android:backgroundTint="#757575"
         android:fontFamily="sans-serif-black"
-        android:text="View Sensor Readings"
+        android:text="Send Location and Status"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -250,7 +250,7 @@
         app:layout_constraintEnd_toStartOf="@+id/helpBtn"
         app:layout_constraintHorizontal_bias="0.025"
         app:layout_constraintStart_toEndOf="@+id/phoneBtn"
-        app:layout_constraintTop_toBottomOf="@+id/monitorBtn"
+        app:layout_constraintTop_toBottomOf="@+id/sendBtn"
         app:srcCompat="@drawable/icon_settings" />
 
     <ImageView
@@ -260,7 +260,7 @@
         android:layout_marginTop="40dp"
         android:layout_marginEnd="40dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/monitorBtn"
+        app:layout_constraintTop_toBottomOf="@+id/sendBtn"
         app:srcCompat="@drawable/icon_info" />
 
     <ImageView
@@ -270,7 +270,7 @@
         android:layout_marginStart="28dp"
         android:layout_marginTop="40dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/monitorBtn"
+        app:layout_constraintTop_toBottomOf="@+id/sendBtn"
         app:srcCompat="@drawable/icon_phone" />
 
 
