@@ -116,6 +116,7 @@ class MainActivity : AppCompatActivity() {
         val tempTile = findViewById<CardView>(R.id.temperatureTile)
         val callBtn = findViewById<ImageView>(R.id.phoneBtn)
         val sendBtn = findViewById<Button>(R.id.sendBtn)
+        val infoBtn = findViewById<ImageView>(R.id.infoBtn)
 
         mainStatus = findViewById(R.id.statusText)
         mainStatus.text = "All Systems Normal"  // default main status
@@ -259,6 +260,11 @@ class MainActivity : AppCompatActivity() {
                     startActivityForResult(intent, CONTACT_PICKER_REQUEST)
                 }
             }
+        }
+
+        infoBtn.setOnClickListener {
+            val intent = Intent(this, InfoActivity::class.java)
+            startActivity(intent)
         }
     }
 
