@@ -555,6 +555,13 @@ class MainActivity : AppCompatActivity() {
             else -> "Warning"
         }
 
+        tempStatus.setTextColor(
+            when {
+                temperature < 10 || temperature > 25 -> Color.RED
+                else -> Color.parseColor("#4CAF50")
+            }
+        )
+
         when {
             temperature <= 10 -> {
                 sendTemperatureNotification("Temperature is too low! $temperature°C. Tap to view more.")
@@ -572,6 +579,13 @@ class MainActivity : AppCompatActivity() {
             "fire detected" -> "Warning"
             else -> "Safe"
         }
+
+        fireStatus.setTextColor(
+            when (fireStatusData) {
+                "fire detected" -> Color.RED
+                else -> Color.parseColor("#4CAF50")
+            }
+        )
         updateMainStatus()
     }
 
@@ -582,6 +596,13 @@ class MainActivity : AppCompatActivity() {
             level in 25.0..75.0 -> "Warning"
             else -> "Warning"
         }
+
+        floodStatus.setTextColor(
+            when {
+                level < 25 -> Color.parseColor("#4CAF50")
+                else -> Color.RED
+            }
+        )
 
         if (level >= 25) {
             sendFloodNotification(level)
@@ -596,6 +617,13 @@ class MainActivity : AppCompatActivity() {
             level in 25.0..75.0 -> "Warning"
             else -> "Warning"
         }
+
+        gasStatus.setTextColor(
+            when {
+                level < 25 -> Color.parseColor("#4CAF50")
+                else -> Color.RED
+            }
+        )
 
         if (level >= 75) {
             sendGasNotification("Gas levels are high! $level%. Immediate action required!")
