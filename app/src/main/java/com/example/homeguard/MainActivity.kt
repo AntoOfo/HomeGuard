@@ -21,6 +21,7 @@ import android.location.LocationListener
 import android.net.Uri
 import android.provider.ContactsContract
 import android.provider.Settings
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -163,7 +164,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-
+                Log.e("Firebase", "Failed to read fire data", error.toException())
             }
         })
         // listen for temp updates on firebase
@@ -177,7 +178,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                Log.e("Firebase", "Failed to read temp data", error.toException())
             }
         })
 
@@ -189,7 +190,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-
+                Log.e("Firebase", "Failed to read humidity data", error.toException())
             }
         })
 
@@ -201,7 +202,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Handle any database error
+                Log.e("Firebase", "Failed to read water data", error.toException())
             }
         })
 
@@ -213,7 +214,9 @@ class MainActivity : AppCompatActivity() {
                 updateGasDialog()
             }
 
-            override fun onCancelled(error: DatabaseError) {}
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Failed to read gas data", error.toException())
+            }
         })
 
         // on click listeners for tiles and buttons
@@ -598,19 +601,19 @@ class MainActivity : AppCompatActivity() {
     // update flood status and send notis if necessary
     private fun updateFloodStatus(level: Double) {
         floodStatus.text = when {
-            level < 25 -> "Safe"
-            level in 25.0..75.0 -> "Warning"
+            level < 5.0 -> "Safe"
+            level in 5.0..75.0 -> "Warning"
             else -> "Warning"
         }
 
         floodStatus.setTextColor(
             when {
-                level < 25 -> Color.parseColor("#4CAF50")
+                level < 5.0 -> Color.parseColor("#4CAF50")
                 else -> Color.RED
             }
         )
 
-        if (level >= 25) {
+        if (level > 5.0) {
             sendFloodNotification(level)
         }
         updateMainStatus()
@@ -619,19 +622,19 @@ class MainActivity : AppCompatActivity() {
     // update gas status and sends notis if needed
     private fun updateGasStatus(level: Double) {
         gasStatus.text = when {
-            level < 25 -> "Safe"
-            level in 25.0..75.0 -> "Warning"
+            level < 10.0 -> "Safe"
+            level in 10.0..75.0 -> "Warning"
             else -> "Warning"
         }
 
         gasStatus.setTextColor(
             when {
-                level < 25 -> Color.parseColor("#4CAF50")
+                level < 10.0 -> Color.parseColor("#4CAF50")
                 else -> Color.RED
             }
         )
 
-        if (level >= 75) {
+        if (level >= 10.0) {
             sendGasNotification("Gas levels are high! $level%. Immediate action required!")
         }
         updateMainStatus()
@@ -686,8 +689,8 @@ class MainActivity : AppCompatActivity() {
     private fun updateGasDialog() {
         if (::gasMessage.isInitialized) {
             val gasStatusText = when {
-                gasLevel < 25 -> "Air Quality Stable - No immediate risk."
-                gasLevel in 25.0..75.0 -> "Warning! Elevated gas levels detected - Please monitor."
+                gasLevel < 10.0 -> "Air Quality Stable - No immediate risk."
+                gasLevel in 10.0..75.0 -> "Warning! Elevated gas levels detected - Please monitor."
                 else -> "Critical Alert! High gas levels detected - Immediate action needed!"
             }
 
@@ -708,8 +711,8 @@ class MainActivity : AppCompatActivity() {
         title.text = "Water Level Details"
 
         val waterLevelStatus = when {
-            waterLevel < 25 -> "Low"
-            waterLevel in 25.0..75.0 -> "Moderate - Monitor the levels"
+            waterLevel < 5.0 -> "Low"
+            waterLevel in 5.0..10.0 -> "Moderate - Monitor the levels"
             else -> "High - Risk of flooding!"
         }
 
