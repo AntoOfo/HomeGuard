@@ -19,6 +19,8 @@ import android.Manifest
 import android.database.Cursor
 import android.location.LocationListener
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.util.Log
@@ -84,6 +86,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var waterLevelRef: DatabaseReference
     private lateinit var gasRef: DatabaseReference
     private lateinit var fireRef: DatabaseReference
+    private lateinit var triggerRef: DatabaseReference
 
     // sensor values
     private var humidity: Double = 0.0
@@ -119,6 +122,7 @@ class MainActivity : AppCompatActivity() {
         val sendBtn = findViewById<Button>(R.id.sendBtn)
         val infoBtn = findViewById<ImageView>(R.id.infoBtn)
 
+
         mainStatus = findViewById(R.id.statusText)
         mainStatus.text = "All Systems Normal"  // default main status
         fireStatus = findViewById(R.id.fireStatus)
@@ -150,6 +154,7 @@ class MainActivity : AppCompatActivity() {
         waterLevelRef = FirebaseDatabase.getInstance().getReference("sensors/water_level")
         gasRef = FirebaseDatabase.getInstance().getReference("sensors/gas")
         fireRef = FirebaseDatabase.getInstance().getReference("sensors/fire_detection")
+        triggerRef = FirebaseDatabase.getInstance().getReference("trigger")
 
         // listen for fire updates on firebase
         fireRef.addValueEventListener(object : ValueEventListener {
@@ -269,7 +274,33 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, InfoActivity::class.java)
             startActivity(intent)
         }
+
     }
+
+    private fun sendOpenWindowsTrigger() {
+
+        val triggerData = mapOf(
+            "status" to "triggered",
+            "timestamp" to System.currentTimeMillis())
+
+        triggerRef.setValue(triggerData).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("Firebase", "Trigger sent successfully")
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    val resetData = mapOf(
+                        "status" to "reset",
+                        "timestamp" to System.currentTimeMillis()
+                    )
+                    triggerRef.setValue(resetData)
+                }, 2000)
+
+            } else {
+                Log.e("Firebase", "Failed to send trigger", task.exception)
+            }
+            }
+        }
+
 
     // set up location updates with location manager
     private fun setupLocationUpdates() {
@@ -741,6 +772,7 @@ class MainActivity : AppCompatActivity() {
             val title = dialogView.findViewById<TextView>(R.id.dialogGasTitle)
             gasMessage = dialogView.findViewById(R.id.dialogGasMessage)  // Store reference for updates
             val closeBtn = dialogView.findViewById<Button>(R.id.closeGasBtn)
+            val openWindowsBtn = dialogView.findViewById<Button>(R.id.openWindowsBtn)
 
             title.text = "Gas Level Details"
 
@@ -750,6 +782,10 @@ class MainActivity : AppCompatActivity() {
 
             closeBtn.setOnClickListener {
                 gasDialog?.dismiss()
+            }
+
+            openWindowsBtn.setOnClickListener {
+                sendOpenWindowsTrigger()
             }
         }
 
