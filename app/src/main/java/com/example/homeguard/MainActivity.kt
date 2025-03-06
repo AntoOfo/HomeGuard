@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gasRef: DatabaseReference
     private lateinit var fireRef: DatabaseReference
     private lateinit var triggerRef: DatabaseReference
+    private lateinit var buzzerRef: DatabaseReference
 
     // sensor values
     private var humidity: Double = 0.0
@@ -155,6 +156,7 @@ class MainActivity : AppCompatActivity() {
         gasRef = FirebaseDatabase.getInstance().getReference("sensors/gas")
         fireRef = FirebaseDatabase.getInstance().getReference("sensors/fire_detection")
         triggerRef = FirebaseDatabase.getInstance().getReference("trigger")
+        buzzerRef = FirebaseDatabase.getInstance().getReference("buzzer_trigger")
 
         // listen for fire updates on firebase
         fireRef.addValueEventListener(object : ValueEventListener {
@@ -300,6 +302,30 @@ class MainActivity : AppCompatActivity() {
             }
             }
         }
+
+    private fun sendBuzzerTrigger() {
+
+        val triggerData = mapOf(
+            "status" to "triggered",
+            "timestamp" to System.currentTimeMillis()
+        )
+
+        buzzerRef.setValue(triggerData).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("Firebase", "Buzzer trigger sent successfully")
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    val resetData = mapOf(
+                        "status" to "reset",
+                        "timestamp" to System.currentTimeMillis()
+                    )
+                    buzzerRef.setValue(resetData)
+                }, 4000)
+            } else {
+                Log.e("Firebase", "Failed to send buzzer trigger...", task.exception)
+            }
+        }
+    }
 
 
     // set up location updates with location manager
@@ -504,6 +530,8 @@ class MainActivity : AppCompatActivity() {
 
         // send notification
         notificationManager.notify(FIRE_NOTIFICATION_ID, notificationBuilder.build())
+
+        sendBuzzerTrigger()
     }
 
     // sends temp alert notification
@@ -531,6 +559,8 @@ class MainActivity : AppCompatActivity() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // send noti
         notificationManager.notify(TEMP_NOTIFICATION_ID, notificationBuilder.build())
+
+        sendBuzzerTrigger()
     }
 
     // sends gas alert notification
@@ -585,6 +615,8 @@ class MainActivity : AppCompatActivity() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // send noti
         notificationManager.notify(FLOOD_NOTIFICATION_ID, notificationBuilder.build())
+
+        sendBuzzerTrigger()
     }
 
     // updates temp status and triggers notis if needed
@@ -665,9 +697,9 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        if (level >= 10.0) {
-            sendGasNotification("Gas levels are high! $level%. Immediate action required!")
-        }
+        //if (level >= 10.0) {
+            //sendGasNotification("Gas levels are high! $level%. Immediate action required!")
+        //}
         updateMainStatus()
     }
 
