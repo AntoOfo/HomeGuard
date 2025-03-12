@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
         android:fontFamily="@font/days_one"
-        android:text="HOMEGUARD"
+        android:text="@string/homeguard"
         android:textColor="#FFFFFF"
         android:textSize="30sp"
         android:textStyle="bold"
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:fontFamily="sans-serif-medium"
-        android:text="All Systems Normal"
+        android:text="@string/all_systems_normal"
         android:textColor="#B0B0B0"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,12 +60,13 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="16dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Gas Leak"
+                android:text="@string/gas_leak"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TextSizeCheck" />
 
             <TextView
                 android:id="@+id/gasStatus"
@@ -73,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="32dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Safe"
+                android:text="@string/safe"
                 android:textColor="#4CAF50"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -107,12 +108,13 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="16dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Flood Risk"
+                android:text="@string/flood_risk"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TextSizeCheck" />
 
             <TextView
                 android:id="@+id/floodStatus"
@@ -120,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="32dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Safe"
+                android:text="@string/safe2"
                 android:textColor="#4CAF50"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -156,12 +158,13 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="16dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Temperature Detection"
+                android:text="@string/temperature_detection"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TextSizeCheck" />
 
             <TextView
                 android:id="@+id/temperatureStatus"
@@ -169,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="32dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Safe"
+                android:text="@string/safe3"
                 android:textColor="#4CAF50"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -186,13 +189,14 @@
         android:layout_marginTop="24dp"
         android:backgroundTint="#757575"
         android:fontFamily="sans-serif-black"
-        android:text="Send Location and Status"
+        android:text="@string/send_location_and_status"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.489"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/temperatureTile" />
+        app:layout_constraintTop_toBottomOf="@+id/temperatureTile"
+        tools:ignore="VisualLintButtonSize" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/fireTile"
@@ -218,12 +222,13 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="16dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Fire Detection"
+                android:text="@string/fire_detection"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TextSizeCheck" />
 
             <TextView
                 android:id="@+id/fireStatus"
@@ -231,7 +236,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="32dp"
                 android:fontFamily="sans-serif-black"
-                android:text="Safe"
+                android:text="@string/safe4"
                 android:textColor="#4CAF50"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -247,6 +252,7 @@
         android:layout_height="54dp"
         android:layout_marginStart="88dp"
         android:layout_marginTop="40dp"
+        android:contentDescription="@string/settings"
         app:layout_constraintEnd_toStartOf="@+id/infoBtn"
         app:layout_constraintHorizontal_bias="0.025"
         app:layout_constraintStart_toEndOf="@+id/phoneBtn"
@@ -259,6 +265,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="40dp"
+        android:contentDescription="@string/information"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sendBtn"
         app:srcCompat="@drawable/icon_info" />
@@ -269,6 +276,7 @@
         android:layout_height="49dp"
         android:layout_marginStart="28dp"
         android:layout_marginTop="40dp"
+        android:contentDescription="@string/emergency_call"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sendBtn"
         app:srcCompat="@drawable/icon_phone" />

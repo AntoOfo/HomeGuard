@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">HomeGuard</string>
+    <string name="homeguard">HOMEGUARD</string>
+    <string name="all_systems_normal">All Systems Normal</string>
+    <string name="gas_leak">Gas Leak</string>
+    <string name="safe">Safe</string>
+    <string name="flood_risk">Flood Risk</string>
+    <string name="safe2">Safe</string>
+    <string name="temperature_detection">Temperature Detection</string>
+    <string name="safe3">Safe</string>
+    <string name="send_location_and_status">Send Location and Status</string>
+    <string name="fire_detection">Fire Detection</string>
+    <string name="safe4">Safe</string>
+    <string name="settings">Settings</string>
+    <string name="information">Information</string>
+    <string name="emergency_call">Emergency Call</string>
 </resources>

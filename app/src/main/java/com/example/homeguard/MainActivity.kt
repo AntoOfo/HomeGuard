@@ -8,14 +8,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.health.connect.datatypes.ExerciseRoute
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.telephony.SmsManager
-import android.view.ViewGroup
 import android.Manifest
+import android.annotation.SuppressLint
 import android.database.Cursor
 import android.location.LocationListener
 import android.net.Uri
@@ -29,21 +28,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.getValue
 
 
 class MainActivity : AppCompatActivity() {
@@ -102,6 +96,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gasMessage: TextView
 
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -341,6 +336,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 override fun onProviderDisabled(provider: String) {}
                 override fun onProviderEnabled(provider: String) {}
+                @Deprecated("Deprecated in Java")
                 override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
             }
 
@@ -733,6 +729,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // update temp details in dialog
+    @SuppressLint("SetTextI18n")
     private fun updateDialog() {
         if (::dialogMessage.isInitialized) {
             val status = when {
@@ -749,6 +746,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // update gas details in dialog
+    @SuppressLint("SetTextI18n")
     private fun updateGasDialog() {
         if (::gasMessage.isInitialized) {
             val gasStatusText = when {
@@ -763,6 +761,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // update flood details in dialog
+    @SuppressLint("SetTextI18n")
     private fun showFloodDetailsDialog() {
         val builder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.dialog_flood_details, null)
@@ -796,6 +795,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // update gas details in dialog
+    @SuppressLint("SetTextI18n")
     private fun showGasDetailsDialog() {
         if (gasDialog == null) {
             val builder = AlertDialog.Builder(this)
