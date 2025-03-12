@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.Bundle
 import android.telephony.SmsManager
 import android.Manifest
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.database.Cursor
 import android.location.LocationListener
@@ -23,6 +24,8 @@ import android.os.Looper
 import android.provider.ContactsContract
 import android.provider.Settings
 import android.util.Log
+import android.view.View
+import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -95,12 +98,15 @@ class MainActivity : AppCompatActivity() {
     private var gasDialog: AlertDialog? = null
     private lateinit var gasMessage: TextView
 
+    private lateinit var blurOverlay: View
+
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
 
         // creates notis channel
         createNotificationChannel()
@@ -129,6 +135,9 @@ class MainActivity : AppCompatActivity() {
         floodStatus.text = "Safe"
         tempStatus = findViewById(R.id.temperatureStatus)
         tempStatus.text = "Safe"
+
+        blurOverlay = findViewById(R.id.blurOverlay)
+        blurOverlay.visibility = View.GONE
 
         // check if certain dialogs to be shown based on intent extras
         val openTempDialog = intent.getBooleanExtra("openTempDialog", false)
@@ -272,6 +281,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+    }
+
+    private fun showDim() {
+        blurOverlay.visibility = View.VISIBLE
     }
 
     private fun sendOpenWindowsTrigger() {
@@ -716,12 +729,19 @@ class MainActivity : AppCompatActivity() {
 
             closeBtn.setOnClickListener {
                 tempDialog?.dismiss()
+                blurOverlay.visibility = View.GONE
             }
         }
 
         // show the dialog if it's not already showing
         if (tempDialog?.isShowing == false) {
             tempDialog?.show()
+
+            val slideIn = ObjectAnimator.ofFloat(tempDialog?.window?.decorView, "translationY", 1000f, 0f)
+            slideIn.duration = 400
+            slideIn.start()
+
+            showDim()
         }
 
         // show latest values in dialog
@@ -789,9 +809,16 @@ class MainActivity : AppCompatActivity() {
 
         closeBtn.setOnClickListener {
             dialog.dismiss()
+            blurOverlay.visibility = View.GONE
         }
 
         dialog.show()
+
+        val slideIn = ObjectAnimator.ofFloat(dialog.window?.decorView, "translationY", 1000f, 0f)
+        slideIn.duration = 400
+        slideIn.start()
+
+        showDim()
     }
 
     // update gas details in dialog
@@ -814,6 +841,7 @@ class MainActivity : AppCompatActivity() {
 
             closeBtn.setOnClickListener {
                 gasDialog?.dismiss()
+                blurOverlay.visibility = View.GONE
             }
 
             openWindowsBtn.setOnClickListener {
@@ -823,7 +851,14 @@ class MainActivity : AppCompatActivity() {
 
         if (gasDialog?.isShowing == false) {
             gasDialog?.show()
+
+            val slideIn = ObjectAnimator.ofFloat(gasDialog?.window?.decorView, "translationY", 1000f, 0f)
+            slideIn.duration = 400
+            slideIn.start()
+
+            showDim()
         }
         updateGasDialog()
+
     }
     }
