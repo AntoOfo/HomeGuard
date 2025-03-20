@@ -231,16 +231,58 @@ class MainActivity : AppCompatActivity() {
         })
 
         // on click listeners for tiles and buttons
-        tempTile.setOnClickListener { showTempDetailsDialog() }
-
-        fireTile.setOnClickListener {
-            val intent = Intent(this, CameraFeedActivity::class.java)
-            startActivity(intent)
+        tempTile.setOnClickListener {
+            tempTile.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .alpha(0.5f)
+                .setDuration(150)
+                .withEndAction {
+                    tempTile.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(150).start()
+                    showTempDetailsDialog()
+                }
+                .start()
         }
 
-        gasTile.setOnClickListener { showGasDetailsDialog() }
+        fireTile.setOnClickListener {
+            fireTile.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .alpha(0.5f)
+                .setDuration(150)
+                .withEndAction {
+                    fireTile.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(150).start()
+                    val intent = Intent(this, CameraFeedActivity::class.java)
+                    startActivity(intent)
+                }
+                .start()
+        }
 
-        floodTile.setOnClickListener { showFloodDetailsDialog() }
+        gasTile.setOnClickListener {
+            gasTile.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .alpha(0.5f)
+                .setDuration(150)
+                .withEndAction {
+                    gasTile.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(150).start()
+                    showGasDetailsDialog()
+                }
+                .start()
+        }
+
+        floodTile.setOnClickListener {
+            floodTile.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .alpha(0.5f)
+                .setDuration(150)
+                .withEndAction {
+                    floodTile.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(150).start()
+                    showFloodDetailsDialog()
+                }
+                .start()
+        }
 
         callBtn.setOnClickListener {
             callBtn.animate()
