@@ -797,9 +797,9 @@ class MainActivity : AppCompatActivity() {
         if (tempDialog?.isShowing == false) {
             tempDialog?.show()
 
-            val slideIn = ObjectAnimator.ofFloat(tempDialog?.window?.decorView, "translationY", 1000f, 0f)
-            slideIn.duration = 400
-            slideIn.start()
+            val fadeIn = ObjectAnimator.ofFloat(tempDialog?.window?.decorView, "alpha", 0f, 1f)
+            fadeIn.duration = 200
+            fadeIn.start()
 
             showDim()
         }
@@ -874,9 +874,9 @@ class MainActivity : AppCompatActivity() {
 
         dialog.show()
 
-        val slideIn = ObjectAnimator.ofFloat(dialog.window?.decorView, "translationY", 1000f, 0f)
-        slideIn.duration = 400
-        slideIn.start()
+        val fadeIn = ObjectAnimator.ofFloat(dialog.window?.decorView, "alpha", 0f, 1f)
+        fadeIn.duration = 200
+        fadeIn.start()
 
         showDim()
     }
@@ -912,10 +912,9 @@ class MainActivity : AppCompatActivity() {
         if (gasDialog?.isShowing == false) {
             gasDialog?.show()
 
-            val slideIn = ObjectAnimator.ofFloat(gasDialog?.window?.decorView, "translationY", 1000f, 0f)
-            slideIn.duration = 400
-            slideIn.start()
-
+            val fadeIn = ObjectAnimator.ofFloat(gasDialog?.window?.decorView, "alpha", 0f, 1f)
+            fadeIn.duration = 200
+            fadeIn.start()
             showDim()
         }
         updateGasDialog()
