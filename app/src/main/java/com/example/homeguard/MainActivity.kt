@@ -243,8 +243,16 @@ class MainActivity : AppCompatActivity() {
         floodTile.setOnClickListener { showFloodDetailsDialog() }
 
         callBtn.setOnClickListener {
-            val intent = Intent(this, EmergencyServicesActivity::class.java)
-            startActivity(intent)
+            callBtn.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .alpha(0.5f)
+                .setDuration(150)
+                .withEndAction {
+                    callBtn.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(150).start()
+                    val intent = Intent(this, EmergencyServicesActivity::class.java)
+                    startActivity(intent)
+                }
         }
 
         sendBtn.setOnClickListener {
@@ -277,8 +285,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         infoBtn.setOnClickListener {
-            val intent = Intent(this, InfoActivity::class.java)
-            startActivity(intent)
+
+            infoBtn.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .alpha(0.5f)
+                .setDuration(150)
+                .withEndAction {
+                    infoBtn.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(150).start()
+                    val intent = Intent(this, InfoActivity::class.java)
+                    startActivity(intent)
+                }
+                .start()
         }
 
     }
