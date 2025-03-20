@@ -247,24 +247,11 @@
     </androidx.cardview.widget.CardView>
 
     <ImageView
-        android:id="@+id/settingsBtn"
-        android:layout_width="54dp"
-        android:layout_height="54dp"
-        android:layout_marginStart="88dp"
-        android:layout_marginTop="40dp"
-        android:contentDescription="@string/settings"
-        app:layout_constraintEnd_toStartOf="@+id/infoBtn"
-        app:layout_constraintHorizontal_bias="0.025"
-        app:layout_constraintStart_toEndOf="@+id/phoneBtn"
-        app:layout_constraintTop_toBottomOf="@+id/sendBtn"
-        app:srcCompat="@drawable/icon_settings" />
-
-    <ImageView
         android:id="@+id/infoBtn"
         android:layout_width="52dp"
         android:layout_height="50dp"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginEnd="24dp"
         android:contentDescription="@string/information"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sendBtn"
