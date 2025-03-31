@@ -18,6 +18,9 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.database.Cursor
 import android.location.LocationListener
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
@@ -100,12 +103,24 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var blurOverlay: View
 
+    private val lastNotificationTimes = HashMap<String, Long>()
+
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        return capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+    }
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        if (!isNetworkAvailable(this)) {
+            Toast.makeText(this, "No internet", Toast.LENGTH_LONG).show()
+        }
 
 
         // creates notis channel
@@ -576,6 +591,17 @@ class MainActivity : AppCompatActivity() {
 
     // send fire alert notification
     private fun sendFireNotification() {
+        val currentTime = System.currentTimeMillis()
+        val delay = 15000L
+
+        val lastTime = lastNotificationTimes["FIRE"] ?: 0
+
+        if (currentTime - lastTime < delay) {
+            return
+        }
+
+        lastNotificationTimes["FIRE"] = currentTime
+
         // intent to open camera feed
         val intent = Intent(this, CameraFeedActivity::class.java)
 
@@ -605,6 +631,16 @@ class MainActivity : AppCompatActivity() {
 
     // sends temp alert notification
     private fun sendTemperatureNotification(message: String) {
+        val currentTime = System.currentTimeMillis()
+        val delay = 15000L
+
+        val lastTime = lastNotificationTimes["TEMP"] ?:0
+
+        if (currentTime - lastTime < delay) {
+            return
+        }
+        lastNotificationTimes["TEMP"] = currentTime
+
         // intent to open temp dialog
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("openTempDialog", true)
@@ -634,6 +670,15 @@ class MainActivity : AppCompatActivity() {
 
     // sends gas alert notification
     private fun sendGasNotification(message: String) {
+        val currentTime = System.currentTimeMillis()
+        val delay = 15000L
+
+        val lastTime = lastNotificationTimes["GAS"] ?:0
+
+        if (currentTime - lastTime < delay) {
+            return
+        }
+        lastNotificationTimes["GAS"] = currentTime
         // intent to open gas dialog
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("openGasDialog", true)
@@ -657,10 +702,21 @@ class MainActivity : AppCompatActivity() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // send noti
         notificationManager.notify(GAS_NOTIFICATION_ID, notificationBuilder.build())
+
+        sendBuzzerTrigger()
     }
 
     // sends flood alert noti
     private fun sendFloodNotification(level: Double) {
+        val currentTime = System.currentTimeMillis()
+        val delay = 15000L
+
+        val lastTime = lastNotificationTimes["FLOOD"] ?:0
+
+        if (currentTime - lastTime < delay) {
+            return
+        }
+        lastNotificationTimes["FLOOD"] = currentTime
         // intent to open flood dialog
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("openFloodDialog", true)
@@ -692,13 +748,13 @@ class MainActivity : AppCompatActivity() {
     private fun updateTempStatus(temperature: Double) {
         tempStatus.text = when {
             temperature < 10  -> "Warning"
-            temperature in 10.0..25.0 -> "Safe"
+            temperature in 10.0..28.0 -> "Safe"
             else -> "Warning"
         }
 
         tempStatus.setTextColor(
             when {
-                temperature < 10 || temperature > 25 -> Color.RED
+                temperature < 10 || temperature > 28 -> Color.RED
                 else -> Color.parseColor("#4CAF50")
             }
         )
@@ -707,7 +763,7 @@ class MainActivity : AppCompatActivity() {
             temperature <= 10 -> {
                 sendTemperatureNotification("Temperature is too low! $temperature°C. Tap to view more.")
             }
-            temperature >= 25 -> {
+            temperature >= 28 -> {
                 sendTemperatureNotification("Temperature is too high! $temperature°C. Tap to view more.")
             }
         }
@@ -754,21 +810,21 @@ class MainActivity : AppCompatActivity() {
     // update gas status and sends notis if needed
     private fun updateGasStatus(level: Double) {
         gasStatus.text = when {
-            level < 10.0 -> "Safe"
-            level in 10.0..75.0 -> "Warning"
+            level < 0.30 -> "Safe"
+            level in 0.30..1.0 -> "Warning"
             else -> "Warning"
         }
 
         gasStatus.setTextColor(
             when {
-                level < 10.0 -> Color.parseColor("#4CAF50")
+                level < 0.30 -> Color.parseColor("#4CAF50")
                 else -> Color.RED
             }
         )
 
-        //if (level >= 10.0) {
-            //sendGasNotification("Gas levels are high! $level%. Immediate action required!")
-        //}
+        if (level >= 0.30) {
+            sendGasNotification("Gas levels are high! $level%. Immediate action required!")
+        }
         updateMainStatus()
     }
 
@@ -830,8 +886,8 @@ class MainActivity : AppCompatActivity() {
     private fun updateGasDialog() {
         if (::gasMessage.isInitialized) {
             val gasStatusText = when {
-                gasLevel < 10.0 -> "Air Quality Stable - No immediate risk."
-                gasLevel in 10.0..75.0 -> "Warning! Elevated gas levels detected - Please monitor."
+                gasLevel < 0.30 -> "Air Quality Stable - No immediate risk."
+                gasLevel in 0.30..1.0 -> "Warning! Elevated gas levels detected - Please monitor."
                 else -> "Critical Alert! High gas levels detected - Immediate action needed!"
             }
 
