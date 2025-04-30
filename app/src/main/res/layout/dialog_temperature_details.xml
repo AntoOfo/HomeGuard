@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Temperature Details"
+        android:text="@string/temperature_details"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"/>
@@ -20,7 +20,7 @@
         android:id="@+id/dialogMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Current temperature: 22°C\nAverage for today: 21°C\nHumidity level: 45%\nStatus: Normal"
+        android:text="@string/current_temperature_22_c_naverage_for_today_21_c_nhumidity_level_45_nstatus_normal"
         android:textSize="16sp"
         android:textColor="#B0B0B0"/>
 
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Close"
+        android:text="@string/closebtn2"
         android:textColor="#FFFFFF"
         android:backgroundTint="#757575"/>
 </LinearLayout>

@@ -14,4 +14,23 @@
     <string name="settings">Settings</string>
     <string name="information">Information</string>
     <string name="emergency_call">Emergency Call</string>
+    <string name="please_investigate_immediately">Please investigate immediately!</string>
+    <string name="status_possible">Status: Possible</string>
+    <string name="back">Back</string>
+    <string name="camera_feed">Camera Feed</string>
+    <string name="name_antonio_ofodile">Name: Antonio Ofodile</string>
+    <string name="id_b00858076">ID: B00858076</string>
+    <string name="project_homeguard">Project: HomeGuard</string>
+    <string name="declaration">I confirm that I understand what plagiarism is and have read the University’s policy on plagiarism and understand the definition of plagiarism. The work that I have submitted is entirely my own. Any work from other authors is duly referenced and acknowledged. I understand that I may face sanctions in accordance with the policies and procedures of the University.</string>
+    <string name="backbtn">Back</string>
+    <string name="water_level_details">Water Level Details</string>
+    <string name="monitor_and_stuff">Monitor and stuff</string>
+    <string name="close">Close</string>
+    <string name="gas_level_details">Gas Level Details</string>
+    <string name="current_gas_level_20_nstatus_safe">Current gas level: 20%\nStatus: Safe</string>
+    <string name="closebtn">Close</string>
+    <string name="open_windows">Open Windows</string>
+    <string name="temperature_details">Temperature Details</string>
+    <string name="current_temperature_22_c_naverage_for_today_21_c_nhumidity_level_45_nstatus_normal">Current temperature: 22°C\nAverage for today: 21°C\nHumidity level: 45%\nStatus: Normal</string>
+    <string name="closebtn2">Close</string>
 </resources>

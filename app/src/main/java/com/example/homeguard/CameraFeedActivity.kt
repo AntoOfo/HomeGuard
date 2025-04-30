@@ -1,5 +1,6 @@
 package com.example.homeguard
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebView
@@ -42,6 +43,7 @@ class CameraFeedActivity : AppCompatActivity() {
 
         // firebase listener
         fireRef.addValueEventListener(object : ValueEventListener {
+            @SuppressLint("SetTextI18n")
             override fun onDataChange(snapshot: DataSnapshot) {
                 // get fire status data from db
                 val fireStatusData = snapshot.child("status").getValue(String::class.java)

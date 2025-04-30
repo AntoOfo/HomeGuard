@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Water Level Details"
+        android:text="@string/water_level_details"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF" />
@@ -20,7 +20,7 @@
         android:id="@+id/dialogFloodMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Monitor and stuff"
+        android:text="@string/monitor_and_stuff"
         android:textSize="16sp"
         android:textColor="#B0B0B0" />
 
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Close"
+        android:text="@string/close"
         android:textColor="#FFFFFF"
         android:backgroundTint="#757575" />
 </LinearLayout>

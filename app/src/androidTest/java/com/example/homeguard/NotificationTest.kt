@@ -41,7 +41,7 @@ class NotificationTest {
 
         val activeNotifications = notificationManager.activeNotifications
 
-        // Assert that at least one notification exists
+        // confirm that at least one notification exists
         assertTrue("Temperature notification was not sent!", activeNotifications.isNotEmpty())
 
     }
@@ -52,13 +52,12 @@ class NotificationTest {
             activity.sendGasNotification("Gas detected!")
         }
 
-        // Wait a moment to ensure notification is posted
         Thread.sleep(1000)
 
-        // Get the active notifications
+        // get active notis
         val activeNotifications = notificationManager.activeNotifications
 
-        // Assert that at least one notification exists
+        // confirm at least one notification exists
         assertTrue("Gas notification was not sent!", activeNotifications.isNotEmpty())
 
     }
@@ -69,13 +68,10 @@ class NotificationTest {
             activity.sendFireNotification()
         }
 
-        // Wait a moment to ensure notification is posted
         Thread.sleep(1000)
 
-        // Get the active notifications
         val activeNotifications = notificationManager.activeNotifications
 
-        // Assert that at least one notification exists
         assertTrue("Fire notification was not sent!", activeNotifications.isNotEmpty())
 
     }
@@ -86,13 +82,10 @@ class NotificationTest {
             activity.sendGasNotification("Water detected!")
         }
 
-        // Wait a moment to ensure notification is posted
         Thread.sleep(1000)
 
-        // Get the active notifications
         val activeNotifications = notificationManager.activeNotifications
 
-        // Assert that at least one notification exists
         assertTrue("Flood notification was not sent!", activeNotifications.isNotEmpty())
 
     }
