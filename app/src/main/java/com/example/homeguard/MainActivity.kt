@@ -590,7 +590,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // send fire alert notification
-    private fun sendFireNotification() {
+    fun sendFireNotification() {
         val currentTime = System.currentTimeMillis()
         val delay = 15000L
 
@@ -630,7 +630,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // sends temp alert notification
-    private fun sendTemperatureNotification(message: String) {
+    fun sendTemperatureNotification(message: String) {
         val currentTime = System.currentTimeMillis()
         val delay = 15000L
 
@@ -669,7 +669,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // sends gas alert notification
-    private fun sendGasNotification(message: String) {
+    fun sendGasNotification(message: String) {
         val currentTime = System.currentTimeMillis()
         val delay = 15000L
 
@@ -707,7 +707,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // sends flood alert noti
-    private fun sendFloodNotification(level: Double) {
+    fun sendFloodNotification(level: Double) {
         val currentTime = System.currentTimeMillis()
         val delay = 15000L
 
