@@ -703,7 +703,7 @@ class MainActivity : AppCompatActivity() {
         // send noti
         notificationManager.notify(GAS_NOTIFICATION_ID, notificationBuilder.build())
 
-        sendBuzzerTrigger()
+        //sendBuzzerTrigger()
     }
 
     // sends flood alert noti

@@ -38,7 +38,7 @@ class CameraFeedActivity : AppCompatActivity() {
         fireRef = FirebaseDatabase.getInstance().getReference("sensors/fire_detection")
 
         // loading video feed url
-        val videoUrl = "http://192.168.1.178:5000"
+        val videoUrl = "http://172.17.209.113:5000"
         camWebView.loadUrl(videoUrl)
 
         // firebase listener
